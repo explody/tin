@@ -1,0 +1,97 @@
+classes:
+  user :
+    create     :
+        method : POST
+        path   : /users
+        defargs: { activate: false }
+        must   : profile
+    get        :
+        method : GET
+        path   : /users/:uid
+    list       : 
+        method : GET
+        path   : /users
+    update     :
+        method : PUT
+        path   : /users/:uid
+        must   : profile
+        public : true
+    appLinks   :
+        method : GET
+        path   : /users/:uid/appLinks
+        public : true
+    groups     :
+        method : GET
+        path   : /users/:uid/groups
+        public : true
+    activate   :
+        method : POST
+        path   : /users/:uid/lifecycle/activate
+        public : true
+        defargs: { sendEmail: False }
+    deactivate :
+        method : POST
+        path   : /users/:uid/lifecycle/deactivate
+        public : true
+    unlock     :
+        method : POST
+        path   : /users/:uid/lifecycle/unlock
+        public : true
+    reset_password :
+        method : POST
+        path   : /users/:uid/lifecycle/reset_password
+        public : true
+        defargs: { sendEmail: False }
+    expire_password :
+        method : POST
+        path   : /users/:uid/lifecycle/expire_password
+        public : true 
+        defargs: { tempPassword: False }       
+    forgot_password :
+        method : POST
+        path   : /users/:uid/credentials/forgot_password
+        public : true
+        defargs: { sendEmail: True }
+    change_password :
+        method : POST
+        path   : /users/:uid/credentials/change_password  
+    change_recovery_question :
+        method : POST
+        path   : /users/:uid/credentials/change_recovery_question       
+  group :
+    create     :
+        method : POST
+        path   : /groups
+    get        :
+        method : GET
+        path   : /groups/:gid
+    list       : 
+        method : GET
+        path   : /groups
+        defargs: { limit: 200 }
+    search     :
+        method : GET
+        path   : /groups
+    update     :
+        method : PUT
+        path   : /groups/:gid
+    delete     :
+        method : DELETE
+        path   : /groups/:gid
+    members    :
+        method : GET
+        path   : /groups/:gid/users
+    _adduser   :
+        method : PUT
+        path   : /groups/:gid/users/:uid
+        return : 204
+    deluser    :
+        method : DELETE
+        path   : /groups/:gid/users/:uid
+    apps       :
+        method : GET
+        path   : /groups/:gid/apps
+  event:
+    list       :
+        method : GET
+        path   : /events
