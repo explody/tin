@@ -1,0 +1,49 @@
+classes:
+  user:
+    get_token:
+      method:   POST
+      path:     /:app_id/user/
+  sections:
+    getall:
+      method:   GET
+      path:     /:app_id/sections/
+    get:
+      method:   GET
+      path:     /:app_id/sections/:id/
+    create:
+      method:   POST
+      path:     /:app_id/sections/:id
+    update:
+      method:   PATCH
+      path:     /:app_id/sections/:id
+    delete:
+      method:   DELETE
+      path:     /:app_id/sections/:id
+    options:
+      method:   OPTIONS
+      path:     /:app_id/sections/:id
+  subnets:
+    getall:
+      method:   GET
+      path:     /sections
+      default_params: { "thing": "stuff" }
+  folders:
+    getall:
+      method:   GET
+      path:     /sections
+  addresses:
+    getall:
+      method:   GET
+      path:     /sections
+  vlans:
+    getall:
+      method:   GET
+      path:     /sections
+  vrfs:
+    getall:
+      method:   GET
+      path:     /sections
+  tools:
+    getall:
+      method:   GET
+      path:     /sections

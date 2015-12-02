@@ -1,0 +1,23 @@
+environments:
+  development:
+    host: pivotal.okta.com
+    scheme: https
+    port: 443
+    credfile: development.yml
+    authtype: header
+    apifile: okta-api.yml
+    objfile: okta-objects.yml
+  production:
+    host: yourhost.okta.com
+    authtype: param
+    credentials:
+      username: someuser
+      password: somepass
+    apifile  : okta-api.yml
+    objfile  : okta-objects.yml
+
+# Common settings apply to all environments
+common:
+  basepath: "/api/v1"
+  params:
+    may: ["links","filter_by","filter_value"]

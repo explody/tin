@@ -1,0 +1,16 @@
+user:
+  profile:
+    must: ['firstName','lastName','email','login']
+    may: ['mobilePhone','employeeId','managerId','customField']
+    
+  credentials:
+    must: ['password']
+    password:
+      must: ['value']
+    recovery_question:
+      must: ['question','answer']
+      
+group:
+  profile:
+    must: ['name']
+    may: ['description']
