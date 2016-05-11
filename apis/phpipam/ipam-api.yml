@@ -12,7 +12,8 @@ classes:
       path:     /:app_id/sections/:id/
     create:
       method:   POST
-      path:     /:app_id/sections/:id
+      path:     /:app_id/sections/
+      return:   201
     update:
       method:   PATCH
       path:     /:app_id/sections/:id
@@ -22,11 +23,31 @@ classes:
     options:
       method:   OPTIONS
       path:     /:app_id/sections/:id
+    subnets:
+      method:   GET
+      path:     /:app_id/sections/:id/subnets/
   subnets:
     getall:
       method:   GET
-      path:     /sections
-      default_params: { "thing": "stuff" }
+      path:     /:app_id/subnets/
+    get:
+      method:   GET
+      path:     /:app_id/subnets/:id/
+      return:   200
+    get_cidr:
+      method:   GET
+      path:     /:app_id/subnets/cidr/:id
+      return:   200
+    search:
+      method:   GET
+      path:     /:app_id/subnets/search/:id/
+    create:
+      method:   POST
+      path:     /:app_id/subnets/
+      return:   201
+    delete:
+      method:   DELETE
+      path:     /:app_id/subnets/:id/
   folders:
     getall:
       method:   GET
@@ -34,11 +55,34 @@ classes:
   addresses:
     getall:
       method:   GET
-      path:     /sections
+      path:     /:app_id/addresses
+    search:
+      method:   GET
+      path:     /:app_id/addresses/search/:id/
+  l2domains:
+    getall:
+      method:   GET
+      path:     /l2domains
+    get:
+      method:   GET
+      path:     /l2domains/:id
+    update:
+      method:   PATCH
+      path:     /l2domains/:id
+    create:
+      method:   POST
+      path:     /l2domains
   vlans:
     getall:
       method:   GET
       path:     /sections
+    search:
+      method:   GET
+      path:     /:app_id/vlans/search/:id/
+    create:
+      method:   POST
+      path:     /:app_id/vlans/
+      return:   201
   vrfs:
     getall:
       method:   GET
