@@ -222,7 +222,6 @@ class ApeyeApiMethod(object):
                     raise ApeyeError("ERROR at %s Apeye says: %s" %
                                      (url, r.text))
 
-                pprint.pprint(r.text)
                 thisresp = r.json()
 
                 if isinstance(resp, list):
