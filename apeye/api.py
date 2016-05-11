@@ -6,6 +6,7 @@ from six import iteritems
 
 from . import ApeyeConfig
 
+import pprint
 
 class ApeyeObjectNotFound(Exception):
 
@@ -83,6 +84,13 @@ class ApeyeApiMethod(object):
 
         self.method = method_data['method']
         self.path = method_data['path']
+
+        # If the method specifies an expected return code, grab it, otherwise
+        # default to 200
+        if 'return' in method_data:
+            self.expect_return = method_data['return']
+        else:
+            self.expect_return = 200
 
         # Here, we handle parameters defined as 'must' or 'may'
         self.must = []
@@ -180,32 +188,41 @@ class ApeyeApiMethod(object):
 
         try:
             resp = None
+            response_count = {}
             while True:
-
                 if self.method == "GET":
                     r = requests.get(url, headers=self.api.conf.headers,
-                                     auth=self.api.auth())
+                                     auth=self.api.auth(), 
+                                     verify=self.api.conf.ssl['verify'],
+                                     params=params)
                 elif self.method == "POST":
                     r = requests.post(url, data=json.dumps(data),
                                       headers=self.api.conf.headers,
-                                      auth=self.api.auth())
+                                      auth=self.api.auth(), 
+                                      verify=self.api.conf.ssl['verify'],
+                                      params=params)
                 elif self.method == "PUT":
                     r = requests.put(url, data=json.dumps(data),
                                      headers=self.api.conf.headers,
-                                     auth=self.api.auth())
+                                     auth=self.api.auth(), 
+                                     verify=self.api.conf.ssl['verify'],
+                                     params=params)
                 elif self.method == "DELETE":
                     r = requests.delete(url, data=json.dumps(data),
                                         headers=self.api.conf.headers,
-                                        auth=self.api.auth())
+                                        auth=self.api.auth(), 
+                                        verify=self.api.conf.ssl['verify'],
+                                        params=params)
 
                 if r.status_code == 404:
                     raise ApeyeObjectNotFound("Object not found. Tried: %s. "
                                               "Apeye says: %s" %
-                                              (url, r.json()))
-                elif r.status_code != 200:
+                                              (url, r.text))
+                elif r.status_code != self.expect_return:
                     raise ApeyeError("ERROR at %s Apeye says: %s" %
-                                     (url, r.json()))
+                                     (url, r.text))
 
+                pprint.pprint(r.text)
                 thisresp = r.json()
 
                 if isinstance(resp, list):
@@ -214,11 +231,41 @@ class ApeyeApiMethod(object):
                     resp.update(thisresp)
                 else:
                     resp = thisresp
-
-                if 'next' not in r.links:
-                    break
+                
+                # Handle pagination types
+                
+                # "header_count" expects a total passed over in the HTTP header
+                # 
+                if ((hasattr(self.api.conf, 'pagination')) and
+                    (self.api.conf.pagination['type'] == 'header_count')):
+                    header_count = r.headers.get(
+                        self.api.conf.pagination['header'], "0"
+                    ) # if the specified header doesn't exist, assume 0 addt'l pages
+                    
+                    response_count['current'] = len(thisresp)
+                    response_count['total'] = len(resp)
+                    
+                    # If we haven't fetched all the records, set the config'd
+                    # path or params then continue
+                    if response_count['total'] < int(header_count):
+                        
+                        v = self.api.conf.pagination['value']
+                        
+                        if 'param' in self.api.conf.pagination:
+                            p = self.api.conf.pagination['param']
+                            params[p] = response_count[v]
+                        elif 'path' in self.api.conf.pagination:
+                            n = self.api.conf.pagination['path']
+                            path = n % response_count[v]
+                            url = '%s/%s' % (url, path)
+                    else:
+                        break
+                    
                 else:
-                    url = r.links['next']['url']
+                    if 'next' not in r.links:
+                        break
+                    else:
+                        url = r.links['next']['url']
 
         except requests.exceptions.HTTPError as e:
             raise ApeyeError("ERROR: %s" % e)

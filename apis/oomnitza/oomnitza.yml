@@ -1,0 +1,33 @@
+environments:
+  development:
+    host: pivotal.oomnitza.com
+    scheme: https
+    port: 443
+    ssl:
+        verify: True
+    credfile: development.yml
+    authtype: header
+    apifile: oomnitza-api.yml
+    objfile: oomnitza-objects.yml
+  production:
+    host: yourhost.okta.com
+    authtype: param
+    credentials:
+      username: someuser
+      password: somepass
+    apifile  : ipam-api.yml
+    objfile  : ipam-objects.yml
+
+# Common settings apply to all environments
+common:
+  type: "application/vnd.api+json"
+  basepath: "/api/v3"
+  pagination: 
+      type: header_count  # default 'links'
+      header: x-total-count
+      # Next should be 'param' or 'path'
+      param: skip    # param will be set as 'param=value' with value below
+      # path:  skip/%s  # where %s will be replaced with 'value' below
+      value: total   # 'total' or 'current' count of items
+  params:
+    may: ["links","filter_by","filter_value"]

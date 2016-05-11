@@ -1,0 +1,23 @@
+classes:
+  authentication:
+    request_token:
+      method:   POST
+      path:     /request_token
+    test:
+      method:   GET
+      path:     /mappings
+      defargs:  { "name": "AuthTest" }
+  assets:
+    get_all:
+      method:   GET
+      path:     /assets/
+    get:
+      method:   GET
+      path:     /assets/:id
+    search:
+      method:   GET
+      path:     /assets
+  messages:
+    get:
+      method:   GET
+      path:     /messages
