@@ -3,6 +3,10 @@ environments:
     host: pivotal.okta.com
     scheme: https
     port: 443
+    ssl:
+        verify: True
+        # cert: /path/to/client.crt
+        # key: /path/to/client.key
     credfile: development.yml
     authtype: header
     apifile: okta-api.yml
@@ -18,6 +22,7 @@ environments:
 
 # Common settings apply to all environments
 common:
+  type: "application/vnd.api+json"
   basepath: "/api/v1"
   params:
     may: ["links","filter_by","filter_value"]

@@ -5,6 +5,8 @@ environments:
     port: 443
     ssl:
         verify: True
+        # cert: /path/to/client.crt
+        # key: /path/to/client.key
     credfile: development.yml
     authtype: header
     apifile: oomnitza-api.yml

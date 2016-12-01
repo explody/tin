@@ -12,9 +12,8 @@ DEFAULTS = {'scheme': 'https',
             'port': 443}
 
 # We only do JSON APIs right now
-DEFAULT_HEADERS = {'Content-type': 'application/json',
-                   'Accept': 'application/json'}
-
+DEFAULT_TYPE = 'application/json'
+                   
 # Paths to check, in order
 #   calling script directory
 #   module directory
@@ -68,7 +67,12 @@ class ApeyeConfig(object):
                                  apeye_env)
 
         self._api_attrs = conf.get('common', {})
-        self.headers = DEFAULT_HEADERS
+        self.headers = {'Content-type': self._api_attrs['type'] if 
+                                        self._api_attrs.get('type', False) else 
+                                        DEFAULT_TYPE,
+                        'Accept': self._api_attrs['type'] if 
+                                  self._api_attrs.get('type', False) else 
+                                  DEFAULT_TYPE} 
 
         if 'headers' in conf:
             self.headers.update(conf['headers'])
