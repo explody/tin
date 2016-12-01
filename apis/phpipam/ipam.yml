@@ -1,10 +1,15 @@
 environments:
   development:
     host: ipam.svc.pivotal.io
+    #host: localhost
     scheme: https
+    #scheme: http
     port: 443
+    #port: 8080
     ssl:
         verify: True
+        # cert: /path/to/client.crt
+        # key: /path/to/client.key
     credfile: development.yml
     authtype: basic
     apifile: ipam-api.yml
@@ -20,10 +25,7 @@ environments:
 
 # Common settings apply to all environments
 common:
-  type: "application/vnd.api+json"
   basepath: "/api"
-  # default_params:
-  #   app_id: mike
   default_tokens:
     app_id: mike
   params:

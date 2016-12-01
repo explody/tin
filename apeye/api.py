@@ -8,15 +8,6 @@ from . import ApeyeConfig
 
 import pprint
 
-class ApeyeObjectNotFound(Exception):
-
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)
-
-
 class ApeyeError(Exception):
 
     def __init__(self, value):
@@ -24,15 +15,16 @@ class ApeyeError(Exception):
 
     def __str__(self):
         return repr(self.value)
+        
+class ApeyeObjectNotFound(ApeyeError):
 
+    def __init__(self, value):
+        super(ApeyeObjectNotFound, self).__init__(value)
 
 class ApeyeInvalidArgs(Exception):
 
     def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)
+        super(ApeyeInvalidArgs, self).__init__(value)
 
 
 class ApeyeApiClass(object):
@@ -153,7 +145,7 @@ class ApeyeApiMethod(object):
 
         return '%s.%s.%s' % (self.api.conf.api_name, self.cls, self.name)
 
-    def __call__(self, **kwargs):
+    def __call__(self, id=None, **kwargs):
 
         # This is where we can put validations on the kwargs,
         # based off data in api.yml (not there yet)
@@ -170,6 +162,12 @@ class ApeyeApiMethod(object):
         # No defaults for data.
         if 'data' in kwargs:
             data = kwargs.pop('data')
+        else:
+            data = None
+        
+        # If 'id' is passed as a positional, it overrides 'id' as a kwarg
+        if id is not None:
+            kwargs['id'] = id
 
         # The remaining kwargs *should* correspond to path tokens
         # Merge with defaults, if they exist
@@ -195,8 +193,19 @@ class ApeyeApiMethod(object):
                                      auth=self.api.auth(), 
                                      verify=self.api.conf.ssl['verify'],
                                      params=params)
+                elif self.method == "OPTIONS":
+                    r = requests.options(url, headers=self.api.conf.headers,
+                                     auth=self.api.auth(), 
+                                     verify=self.api.conf.ssl['verify'],
+                                     params=params)
                 elif self.method == "POST":
                     r = requests.post(url, data=json.dumps(data),
+                                      headers=self.api.conf.headers,
+                                      auth=self.api.auth(), 
+                                      verify=self.api.conf.ssl['verify'],
+                                      params=params)
+                elif self.method == "PATCH":
+                    r = requests.patch(url, data=json.dumps(data),
                                       headers=self.api.conf.headers,
                                       auth=self.api.auth(), 
                                       verify=self.api.conf.ssl['verify'],
@@ -222,7 +231,11 @@ class ApeyeApiMethod(object):
                     raise ApeyeError("ERROR at %s Apeye says: %s" %
                                      (url, r.text))
 
-                thisresp = r.json()
+                try:
+                    thisresp = r.json()
+                except Exception as e:
+                    raise ApeyeError("ERROR decoding response JSON. "
+                                     "Raw response is: %s" % r.text)
 
                 if isinstance(resp, list):
                     resp.extend(thisresp)

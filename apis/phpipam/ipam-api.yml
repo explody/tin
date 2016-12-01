@@ -36,7 +36,7 @@ classes:
       return:   200
     get_cidr:
       method:   GET
-      path:     /:app_id/subnets/cidr/:id
+      path:     /:app_id/subnets/cidr/:id/
       return:   200
     search:
       method:   GET
@@ -45,6 +45,10 @@ classes:
       method:   POST
       path:     /:app_id/subnets/
       return:   201
+    update:
+      method:   PATCH
+      path:     /:app_id/subnets/:id/
+      return:   200
     delete:
       method:   DELETE
       path:     /:app_id/subnets/:id/
@@ -53,16 +57,24 @@ classes:
       method:   GET
       path:     /sections
   addresses:
+    add:
+      method:   POST
+      path:     /:app_id/addresses/
+      return:   201
+    update:
+      method:   PATCH
+      path:     /:app_id/addresses/:id/
+      return:   200
     getall:
       method:   GET
-      path:     /:app_id/addresses
+      path:     /:app_id/addresses/
     search:
       method:   GET
       path:     /:app_id/addresses/search/:id/
   l2domains:
     getall:
       method:   GET
-      path:     /l2domains
+      path:     /l2domains/
     get:
       method:   GET
       path:     /l2domains/:id
@@ -71,23 +83,44 @@ classes:
       path:     /l2domains/:id
     create:
       method:   POST
-      path:     /l2domains
+      path:     /l2domains/
   vlans:
     getall:
       method:   GET
-      path:     /sections
+      path:     /:app_id/tools/vlans/
     search:
       method:   GET
-      path:     /:app_id/vlans/search/:id/
+      path:     /:app_id/tools/vlans/search/:id/
     create:
       method:   POST
-      path:     /:app_id/vlans/
+      path:     /:app_id/tools/vlans/
       return:   201
   vrfs:
     getall:
       method:   GET
       path:     /sections
-  tools:
+  devices:
+    options:
+      method:   OPTIONS
+      path:     /:app_id/devices/
     getall:
       method:   GET
-      path:     /sections
+      path:     /:app_id/devices/
+    add:
+      method:   POST
+      path:     /:app_id/devices/
+      return:   201
+    delete:
+      method:   DELETE
+      path:     /:app_id/devices/:id/
+    get:
+      method:   GET
+      path:     /:app_id/devices/:id/
+    update:
+      method:   PATCH
+      path:     /:app_id/devices/:id/
+    search:
+      method:   GET
+      path:     /:app_id/devices/search/:id/
+     
+        
