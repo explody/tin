@@ -52,6 +52,9 @@ classes:
     delete:
       method:   DELETE
       path:     /:app_id/subnets/:id/
+    slaves:
+      method:   GET
+      path:     /:app_id/subnets/:id/slaves/
   folders:
     getall:
       method:   GET

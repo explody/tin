@@ -1,7 +1,7 @@
 environments:
   development:
-    host: ipam.svc.pivotal.io
-    #host: localhost
+    host: ipam-test.iops.pivotal.io
+    #host: thallium.local
     scheme: https
     #scheme: http
     port: 443

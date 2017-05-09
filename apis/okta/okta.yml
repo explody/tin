@@ -1,6 +1,6 @@
 environments:
   development:
-    host: pivotal.okta.com
+    host: pivotal.oktapreview.com
     scheme: https
     port: 443
     ssl:

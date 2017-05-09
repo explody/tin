@@ -95,3 +95,8 @@ classes:
     list       :
         method : GET
         path   : /events
+  apps:
+    get:
+        method : GET
+        path   : /apps/:aid
+     
