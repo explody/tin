@@ -38,6 +38,10 @@ classes:
       method:   GET
       path:     /:app_id/subnets/cidr/:id/
       return:   200
+    addresses:
+      method:   GET
+      path:     /:app_id/subnets/:id/addresses/
+      return:   200
     search:
       method:   GET
       path:     /:app_id/subnets/search/:id/
