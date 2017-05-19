@@ -88,6 +88,9 @@ classes:
     getall:
       method:   GET
       path:     /:app_id/tools/vlans/
+    get:
+      method:   GET
+      path:     /:app_id/tools/vlans/:id/
     search:
       method:   GET
       path:     /:app_id/tools/vlans/search/:id/
