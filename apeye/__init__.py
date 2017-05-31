@@ -54,13 +54,13 @@ class ApeyeConfig(object):
         else:
             apeye_env = environ
 
+        self.confpaths = confpaths
         self.confpath = self.find_config(conffile)
         fh = open(self.confpath, "rb")
         conf = yaml.load(fh.read())
 
         # Add the directory of the file we just loaded to confpaths
-        self.confpaths = confpaths + [os.path.dirname(
-                                        os.path.abspath(self.confpath))]
+        self.confpaths.append(os.path.dirname(os.path.abspath(self.confpath)))
 
         if apeye_env not in conf['environments']:
             raise ApeyeException("No such environment is configured: %s" %
