@@ -1,27 +1,34 @@
 environments:
-  development:
-    host: ipam.svc.pivotal.io
-    #host: localhost
-    scheme: https
-    #scheme: http
-    port: 443
-    #port: 8080
-    ssl:
-        verify: True
-        # cert: /path/to/client.crt
-        # key: /path/to/client.key
-    credfile: development.yml
+  vagrant:
+    host: phpipam.local
+    scheme: http
+    port: 80
+    credfile: vagrant.yml
     authtype: basic
+    ssl:
+        verify: false
     apifile: ipam-api.yml
     objfile: ipam-objects.yml
-  production:
-    host: yourhost.okta.com
-    authtype: param
-    credentials:
-      username: someuser
-      password: somepass
-    apifile  : ipam-api.yml
-    objfile  : ipam-objects.yml
+  prod:
+    host: ipam.svc.pivotal.io
+    scheme: https
+    port: 443
+    credfile: production.yml
+    authtype: basic
+    ssl:
+        verify: true
+    apifile: ipam-api.yml
+    objfile: ipam-objects.yml
+  dev:
+    host: ipam-test.iops.pivotal.io
+    scheme: https
+    port: 443
+    credfile: development.yml
+    authtype: basic
+    ssl:
+        verify: true
+    apifile: ipam-api.yml
+    objfile: ipam-objects.yml
 
 # Common settings apply to all environments
 common:

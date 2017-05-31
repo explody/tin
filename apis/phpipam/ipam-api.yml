@@ -26,6 +26,12 @@ classes:
     subnets:
       method:   GET
       path:     /:app_id/sections/:id/subnets/
+    vlans:
+      method:   GET
+      path:     /:app_id/sections/:id/vlans/
+    l2domains:
+      method:   GET
+      path:     /:app_id/sections/:id/l2domains/
   subnets:
     getall:
       method:   GET
@@ -38,9 +44,9 @@ classes:
       method:   GET
       path:     /:app_id/subnets/cidr/:id/
       return:   200
-    addresses:
+    usage:
       method:   GET
-      path:     /:app_id/subnets/:id/addresses/
+      path:     /:app_id/subnets/:id/usage/
       return:   200
     search:
       method:   GET
@@ -56,6 +62,9 @@ classes:
     delete:
       method:   DELETE
       path:     /:app_id/subnets/:id/
+    slaves:
+      method:   GET
+      path:     /:app_id/subnets/:id/slaves/
   folders:
     getall:
       method:   GET
@@ -78,29 +87,38 @@ classes:
   l2domains:
     getall:
       method:   GET
-      path:     /l2domains/
+      path:     /:app_id/l2domains/
     get:
       method:   GET
-      path:     /l2domains/:id
+      path:     /:app_id/l2domains/:id/
+    vlans:
+      method:   GET
+      path:     /:app_id/l2domains/:id/vlans/
     update:
       method:   PATCH
-      path:     /l2domains/:id
+      path:     /:app_id/l2domains/:id/
     create:
       method:   POST
-      path:     /l2domains/
+      path:     /:app_id/l2domains/
   vlans:
     getall:
       method:   GET
-      path:     /:app_id/tools/vlans/
+      path:     /:app_id/vlans/
     get:
       method:   GET
-      path:     /:app_id/tools/vlans/:id/
+      path:     /:app_id/vlans/:id/
+    subnets:
+      method:   GET
+      path:     /:app_id/vlans/:id/subnets/
+    section_subnets:
+      method:   GET
+      path:     /:app_id/vlans/:id/subnets/:sid/
     search:
       method:   GET
-      path:     /:app_id/tools/vlans/search/:id/
+      path:     /:app_id/vlans/search/:id/
     create:
       method:   POST
-      path:     /:app_id/tools/vlans/
+      path:     /:app_id/vlans/
       return:   201
   vrfs:
     getall:
