@@ -104,6 +104,7 @@ classes:
     create:
       method:   POST
       path:     /:app_id/l2domains/
+      return:   201
   vlans:
     getall:
       method:   GET
@@ -124,6 +125,9 @@ classes:
       method:   POST
       path:     /:app_id/vlans/
       return:   201
+    update:
+      method:   PATCH
+      path:     /:app_id/vlans/:id/
   vrfs:
     getall:
       method:   GET
