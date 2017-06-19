@@ -17,6 +17,9 @@ classes:
     search:
       method:   GET
       path:     /assets
+    update:
+      method:   PATCH
+      path:     /assets/:id
   messages:
     get:
       method:   GET

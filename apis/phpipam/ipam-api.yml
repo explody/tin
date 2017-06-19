@@ -44,6 +44,9 @@ classes:
       method:   GET
       path:     /:app_id/subnets/cidr/:id/
       return:   200
+    first_free:
+      method:   GET
+      path:     /:app_id/subnets/:id/first_free/
     usage:
       method:   GET
       path:     /:app_id/subnets/:id/usage/
@@ -74,9 +77,19 @@ classes:
       method:   GET
       path:     /sections
   addresses:
+    get:
+      method:   GET
+      path:     /:app_id/addresses/:id/
+    delete:
+      method:   DELETE
+      path:     /:app_id/addresses/:id/
     add:
       method:   POST
       path:     /:app_id/addresses/
+      return:   201
+    first_free:
+      method:   POST
+      path:     /:app_id/addresses/first_free/:sid/
       return:   201
     update:
       method:   PATCH
@@ -104,6 +117,7 @@ classes:
     create:
       method:   POST
       path:     /:app_id/l2domains/
+      return:   201
   vlans:
     getall:
       method:   GET
@@ -124,6 +138,9 @@ classes:
       method:   POST
       path:     /:app_id/vlans/
       return:   201
+    update:
+      method:   PATCH
+      path:     /:app_id/vlans/:id/
   vrfs:
     getall:
       method:   GET
@@ -145,6 +162,9 @@ classes:
     get:
       method:   GET
       path:     /:app_id/devices/:id/
+    addresses:
+      method:   GET
+      path:     /:app_id/devices/:id/addresses/
     update:
       method:   PATCH
       path:     /:app_id/devices/:id/
