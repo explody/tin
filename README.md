@@ -35,5 +35,3 @@ okta = ApeyeApi(conffile='apis/okta/okta.yml')
 #
 pprint.pprint(okta.user.get(uid='mculbertson@pivotal.io')['profile'])
 ```
-
-Sample edit
