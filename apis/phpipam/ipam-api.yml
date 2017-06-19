@@ -53,7 +53,7 @@ classes:
       return:   200
     addresses:
       method:   GET
-      path:     /:app_id/subnets/:id/addresses/
+      path:     /:app_id/subnets/:id/usage/
       return:   200
     search:
       method:   GET
