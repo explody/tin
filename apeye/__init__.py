@@ -20,7 +20,8 @@ DEFAULT_TYPE = 'application/json'
 #   user home directory
 confpaths = [os.path.dirname(os.path.realpath(sys.argv[0])),
              os.path.dirname(os.path.realpath(__file__)),
-             os.path.expanduser('~')]
+             os.path.expanduser('~'),
+             os.path.expanduser('~/.apeye')]
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -56,6 +57,7 @@ class ApeyeConfig(object):
 
         self.confpaths = confpaths
         self.confpath = self.find_config(conffile)
+        logger.info("Using config: % s Environment: %s" % (self.confpath, environ))
         fh = open(self.confpath, "rb")
         conf = yaml.load(fh.read())
 
