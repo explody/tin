@@ -19,6 +19,27 @@ environments:
         verify: true
     apifile: ipam-api.yml
     objfile: ipam-objects.yml
+  nagios:
+    host: ipam.svc.pivotal.io
+    scheme: https
+    port: 443
+    credfile: nagios.yml
+    authtype: basic
+    ssl:
+        verify: true
+    apifile: ipam-api.yml
+    objfile: ipam-objects.yml
+  sc:
+    host: ipam1-sc.vchs.pivotal.io
+    scheme: https
+    port: 443
+    credfile: production.yml
+    authtype: basic
+    ssl:
+        verify: false
+    apifile: ipam-api.yml
+    objfile: ipam-objects.yml
+
   dev:
     host: ipam-test.iops.pivotal.io
     scheme: https
