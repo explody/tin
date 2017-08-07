@@ -164,6 +164,10 @@ class ApeyeApiMethod(object):
             data = kwargs.pop('data')
         else:
             data = None
+
+        of = None
+        if 'output' in kwargs:
+            of = open(kwargs.pop('output'), 'wb')
         
         # If 'id' is passed as a positional, it overrides 'id' as a kwarg
         if id is not None:
@@ -228,8 +232,11 @@ class ApeyeApiMethod(object):
                                               "Apeye says: %s" %
                                               (url, r.text))
                 elif r.status_code != self.expect_return:
-                    raise ApeyeError("ERROR at %s Apeye says: %s" %
-                                     (url, r.text))
+                    raise ApeyeError("ERROR at %s Expected return %s got %s Apeye says: %s" %
+                                     (url, self.expect_return, r.status_code, r.text))
+
+                if not r.text:
+                    return {}
 
                 try:
                     thisresp = r.json()
@@ -237,13 +244,17 @@ class ApeyeApiMethod(object):
                     raise ApeyeError("ERROR decoding response JSON. "
                                      "Raw response is: %s" % r.text)
 
-                if isinstance(resp, list):
+                if of:
+                    of.write(json.dumps(thisresp, sort_keys=True, indent=4))
+                    of.flush()
+                    resp = thisresp
+                elif isinstance(resp, list):
                     resp.extend(thisresp)
                 elif isinstance(resp, dict):
                     resp.update(thisresp)
                 else:
                     resp = thisresp
-                
+
                 # Handle pagination types
                 
                 # "header_count" expects a total passed over in the HTTP header
@@ -282,6 +293,9 @@ class ApeyeApiMethod(object):
         except requests.exceptions.HTTPError as e:
             raise ApeyeError("ERROR: %s" % e)
 
+        if of:
+            of.close()
+
         return resp
 
 
@@ -317,8 +331,12 @@ class ApeyeApi(object):
             return requests.auth.HTTPBasicAuth(u, p)
 
         elif self.conf.authtype == 'header':
+            if isinstance(self.conf.credentials, str):
+                headers = {'Authorization': self.conf.credentials}
+            else:
+                headers = self.conf.credentials
 
-            return HTTPGenericHeaderAuth(self.conf.credentials)
+            return HTTPGenericHeaderAuth(headers)
 
         elif self.conf.authtype == 'param':
 

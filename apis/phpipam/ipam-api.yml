@@ -35,7 +35,7 @@ classes:
   subnets:
     getall:
       method:   GET
-      path:     /:app_id/subnets/
+      path:     /:app_id/subnets/all/
     get:
       method:   GET
       path:     /:app_id/subnets/:id/
@@ -53,14 +53,21 @@ classes:
       return:   200
     addresses:
       method:   GET
-      path:     /:app_id/subnets/:id/usage/
+      path:     /:app_id/subnets/:id/addresses/
       return:   200
+    ranges:
+      method:   GET
+      path:     /:app_id/subnets/:id/ranges/
     search:
       method:   GET
       path:     /:app_id/subnets/search/:id/
     create:
       method:   POST
       path:     /:app_id/subnets/
+      return:   201
+    create_first_available:
+      method:   POST
+      path:     /:app_id/subnets/:id/first_subnet/:mask/
       return:   201
     update:
       method:   PATCH
@@ -72,6 +79,15 @@ classes:
     slaves:
       method:   GET
       path:     /:app_id/subnets/:id/slaves/
+    recursive:
+      method:   GET
+      path:     /:app_id/subnets/:id/recursive/
+    gateway:
+      method:   GET
+      path:     /:app_id/subnets/:id/gateway/
+    custom_fields:
+      method:   GET
+      path:     /:app_id/subnets/custom_fields/
   folders:
     getall:
       method:   GET
@@ -145,6 +161,33 @@ classes:
     getall:
       method:   GET
       path:     /sections
+  macs:
+    options:
+      method:   OPTIONS
+      path:     /:app_id/macs/
+    getall:
+      method:   GET
+      path:     /:app_id/macs/
+    add:
+      method:   POST
+      path:     /:app_id/macs/
+      return:   201
+    delete:
+      method:   DELETE
+      path:     /:app_id/macs/:id/
+    get:
+      method:   GET
+      path:     /:app_id/macs/:id/
+    update:
+      method:   PATCH
+      path:     /:app_id/macs/:id/
+      return:   201
+    search:
+      method:   GET
+      path:     /:app_id/macs/search/:id/
+    device:
+      method:   GET
+      path:     /:app_id/macs/:id/device/
   devices:
     options:
       method:   OPTIONS
@@ -168,6 +211,7 @@ classes:
     update:
       method:   PATCH
       path:     /:app_id/devices/:id/
+      return:   201
     search:
       method:   GET
       path:     /:app_id/devices/search/:id/
@@ -191,6 +235,7 @@ classes:
     update:
       method:   PATCH
       path:     /:app_id/locations/:id/
+      return:   201
     search:
       method:   GET
       path:     /:app_id/locations/search/:id/

@@ -1,10 +1,28 @@
 classes:
+  logs:
+    get:
+        method : GET
+        path   : /logs
+  apps:
+    get:
+        method : GET
+        path   : /apps/:aid
+    remove_user:
+        method : DELETE
+        path   : /apps/:aid/users/:uid
   user :
+    remove_from_app:
+        method: DELETE
+        path:   /apps/:aid/users/:uid
     create     :
         method : POST
         path   : /users
         defargs: { activate: false }
         must   : profile
+    delete     :
+        method : DELETE
+        path   : /users/:uid
+        return : 204
     get        :
         method : GET
         path   : /users/:uid
@@ -81,13 +99,14 @@ classes:
     members    :
         method : GET
         path   : /groups/:gid/users
-    _adduser   :
+    adduser    :
         method : PUT
         path   : /groups/:gid/users/:uid
         return : 204
     deluser    :
         method : DELETE
         path   : /groups/:gid/users/:uid
+        return : 204
     apps       :
         method : GET
         path   : /groups/:gid/apps
@@ -95,8 +114,4 @@ classes:
     list       :
         method : GET
         path   : /events
-  apps:
-    get:
-        method : GET
-        path   : /apps/:aid
      

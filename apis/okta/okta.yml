@@ -12,17 +12,19 @@ environments:
     apifile: okta-api.yml
     objfile: okta-objects.yml
   production:
-    host: yourhost.okta.com
-    authtype: param
-    credentials:
-      username: someuser
-      password: somepass
+    host: pivotal.okta.com
+    scheme: https
+    port: 443
+    ssl:
+        verify: true
+    authtype: header
+    credfile: production.yml
     apifile  : okta-api.yml
     objfile  : okta-objects.yml
 
 # Common settings apply to all environments
 common:
-  type: "application/vnd.api+json"
+  type: "application/json"
   basepath: "/api/v1"
   params:
     may: ["links","filter_by","filter_value"]
