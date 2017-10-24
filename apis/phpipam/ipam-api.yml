@@ -35,7 +35,7 @@ classes:
   subnets:
     getall:
       method:   GET
-      path:     /:app_id/subnets/all/
+      path:     /:app_id/subnets/
     get:
       method:   GET
       path:     /:app_id/subnets/:id/
@@ -117,6 +117,10 @@ classes:
     search:
       method:   GET
       path:     /:app_id/addresses/search/:id/
+    first_free:
+      method:   POST
+      path:     /:app_id/addresses/first_free/:sid/
+      return:   201
   l2domains:
     getall:
       method:   GET

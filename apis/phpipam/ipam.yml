@@ -9,6 +9,8 @@ environments:
         verify: false
     apifile: ipam-api.yml
     objfile: ipam-objects.yml
+    default_tokens:
+        app_id: testing
   prod:
     host: ipam.svc.pivotal.io
     scheme: https
@@ -50,6 +52,8 @@ environments:
         verify: true
     apifile: ipam-api.yml
     objfile: ipam-objects.yml
+    default_tokens:
+        app_id: testing
 
 # Common settings apply to all environments
 common:
