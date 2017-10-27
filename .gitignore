@@ -1,4 +1,14 @@
 .idea
 __pycache__
+*.pyc
+build
+dist
+
+/*.py
+/*.csv
+/*.txt
+!/setup.py
+
+production.yml
 development.yml
-test.py
+vagrant.yml

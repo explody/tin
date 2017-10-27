@@ -1,0 +1,23 @@
+environments:
+  vagrant:
+    host: localhost
+    scheme: http
+    port: 8080
+    credfile: vagrant.yml
+    authtype: none
+    ssl:
+        verify: false
+    apifile: netbox-swagger.json
+  dev:
+    host: ipam-beta.iops.pivotal.io
+    scheme: https
+    port: 443
+    credfile: development.yml
+    authtype: basic
+    ssl:
+        verify: true
+    apifile: netbox-swagger.json
+
+# Common settings apply to all environments
+common:
+  basepath: "/api"
