@@ -2,6 +2,7 @@ import os
 import sys
 import yaml
 import logging
+import simplejson as json
 from six import iteritems
 
 from .version import VERSION
@@ -13,7 +14,7 @@ DEFAULTS = {'scheme': 'https',
 
 # We only do JSON APIs right now
 DEFAULT_TYPE = 'application/json'
-                   
+
 # Paths to check, in order
 #   calling script directory
 #   module directory
@@ -27,7 +28,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class ApeyeException(Exception):
+class ApeyeError(Exception):
+    """Generic Apeye exception"""
 
     def __init__(self, value):
         self.value = value
@@ -37,6 +39,7 @@ class ApeyeException(Exception):
 
 
 class ApeyeConfigNotFound(Exception):
+    """Config file not found exception"""
 
     def __init__(self, filename, paths):
         self.value = "Not found: [" + filename + "] I looked here:" + \
@@ -47,6 +50,20 @@ class ApeyeConfigNotFound(Exception):
 
 
 class ApeyeConfig(object):
+    """Class which represents the configuration of the API
+
+    Configuration will be loaded from a YAML or JSON file, which may have different environments
+    defined, each with their own settings.  Upon parsing, the config key->values will be stored
+    as object attributes.
+
+    Args:
+        conffile (str): Relative or absolute path to the YAML or JSON config file
+        environ (str): Name of the environment to load
+
+    Attributes:
+        confpaths (list): List of strings of paths in which to find the conffile. Defined above.
+        confpath (str): Final file path of the config file
+    """
 
     def __init__(self, conffile='apeye.yml', environ='development'):
 
@@ -65,16 +82,16 @@ class ApeyeConfig(object):
         self.confpaths.append(os.path.dirname(os.path.abspath(self.confpath)))
 
         if apeye_env not in conf['environments']:
-            raise ApeyeException("No such environment is configured: %s" %
+            raise ApeyeError("No such environment is configured: %s" %
                                  apeye_env)
 
         self._api_attrs = conf.get('common', {})
-        self.headers = {'Content-type': self._api_attrs['type'] if 
-                                        self._api_attrs.get('type', False) else 
-                                        DEFAULT_TYPE,
-                        'Accept': self._api_attrs['type'] if 
-                                  self._api_attrs.get('type', False) else 
-                                  DEFAULT_TYPE} 
+        self.headers = {'Content-type': self._api_attrs['type'] if
+                        self._api_attrs.get('type', False) else
+                        DEFAULT_TYPE,
+                        'Accept': self._api_attrs['type'] if
+                        self._api_attrs.get('type', False) else
+                        DEFAULT_TYPE}
 
         if 'headers' in conf:
             self.headers.update(conf['headers'])
@@ -90,29 +107,56 @@ class ApeyeConfig(object):
 
         # noinspection PyUnresolvedReferences
         if self.credfile:
-            self.credfile = self.find_config(self.credfile)
-            self.credentials = yaml.load(open(self.credfile, "rb").read())
-
-        # noinspection PyUnresolvedReferences
-        objfile = self.find_config(self.objfile)
-        ofh = open(objfile, "rb")
-        self.objdata = yaml.load(ofh.read())
+            self.credentials = self._loadfile(self.find_config(self.credfile))
 
         # noinspection PyUnresolvedReferences
         apifile = self.find_config(self.apifile)
-        afh = open(apifile, "rb")
-        self.apidata = yaml.load(afh.read())
+        self.apidata = self._loadfile(apifile)
+
+    def _loadfile(self, fpath):
+        """Parses the conf file as YAML or JSON based on file extension
+
+        Arguments:
+            fpath (str): Path to the file
+
+        Returns
+            dict: Contents of the file parsed to a dict
+        """
+
+        fh = open(fpath, "rb")
+        if fpath.endswith('.yml'):
+            return yaml.load(fh.read())
+        elif fpath.endswith('.json'):
+            return json.loads(fh.read())
 
     def set(self, key, value):
+        """Config attribute setter
+
+        Arguments:
+            key (str): Name of the attribute
+            value (str): Value to set. Presumed to be a string but this isn't enforced.
+        """
 
         setattr(self, key, value)
 
     def get(self, key):
+        """Config attribute getter
 
+        Arguments:
+            key (str): Name of the attribute
+
+        Returns:
+            The value of the attribute
+        """
         return getattr(self, key)
 
     def find_config(self, filename):
+        """Searches the confpaths for the given config file
 
+        Arguments:
+            filename (str): The absolute or relative path to the file"
+        """
+        
         # expanduser here in case someone passed a "~" path
         filename = os.path.expanduser(filename)
 

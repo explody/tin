@@ -215,7 +215,6 @@ classes:
     update:
       method:   PATCH
       path:     /:app_id/devices/:id/
-      return:   201
     search:
       method:   GET
       path:     /:app_id/devices/search/:id/
