@@ -294,7 +294,9 @@ class ApeyeApiMethod(object):
                                               (url, r.text))
                 elif r.status_code not in self.expect_return:
                     raise ApeyeError("ERROR at %s Got return code %s, expected %s. Apeye says: %s" %
-                                     (url, r.status_code, ",".join(self.expect_return), r.text))
+                                     (url, r.status_code,
+                                      ",".join([str(r) for r in self.expect_return]),
+                                      r.text))
 
                 try:
                     thisresp = r.json()
@@ -310,7 +312,7 @@ class ApeyeApiMethod(object):
                     resp = thisresp
 
                 # Handle pagination types
-
+                pprint.pprint(r.links)
                 # "header_count" expects a total passed over in the HTTP header
                 #
                 if ((hasattr(self.api.conf, 'pagination')) and
@@ -452,7 +454,7 @@ class ApeyeApi(ApeyeApiClass):
             mthdata (dict): A set of data about the method
             objpath (str): The full object path as a string. e.g. "path.to.endpoint"
         """
-        current = paths[0]
+        current = paths[0].replace("-", "_")
 
         # If no objpath is given, we're at the firs element of the paths list
         if objpath is None:
