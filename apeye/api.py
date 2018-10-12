@@ -2,6 +2,7 @@
 import re
 import collections
 import requests
+import urllib
 import simplejson as json
 from six import iteritems
 
@@ -257,36 +258,42 @@ class ApeyeApiMethod(object):
                     r = requests.get(url, headers=self.api.conf.headers,
                                      auth=self.api.auth(),
                                      verify=self.api.conf.ssl['verify'],
-                                     params=params)
+                                     params=urllib.parse.urlencode(params, 
+                                                                   quote_via=urllib.parse.quote))
                 elif self.method == "OPTIONS":
                     r = requests.options(url, headers=self.api.conf.headers,
                                          auth=self.api.auth(),
                                          verify=self.api.conf.ssl['verify'],
-                                         params=params)
+                                         params=urllib.parse.urlencode(params,
+                                                                       quote_via=urllib.parse.quote))
                 elif self.method == "POST":
                     r = requests.post(url, data=json.dumps(data),
                                       headers=self.api.conf.headers,
                                       auth=self.api.auth(),
                                       verify=self.api.conf.ssl['verify'],
-                                      params=params)
+                                      params=urllib.parse.urlencode(params,
+                                                                    quote_via=urllib.parse.quote))
                 elif self.method == "PATCH":
                     r = requests.patch(url, data=json.dumps(data),
                                        headers=self.api.conf.headers,
                                        auth=self.api.auth(),
                                        verify=self.api.conf.ssl['verify'],
-                                       params=params)
+                                       params=urllib.parse.urlencode(params,
+                                                                     quote_via=urllib.parse.quote))
                 elif self.method == "PUT":
                     r = requests.put(url, data=json.dumps(data),
                                      headers=self.api.conf.headers,
                                      auth=self.api.auth(),
                                      verify=self.api.conf.ssl['verify'],
-                                     params=params)
+                                     params=urllib.parse.urlencode(params,
+                                                                   quote_via=urllib.parse.quote))
                 elif self.method == "DELETE":
                     r = requests.delete(url, data=json.dumps(data),
                                         headers=self.api.conf.headers,
                                         auth=self.api.auth(),
                                         verify=self.api.conf.ssl['verify'],
-                                        params=params)
+                                        params=urllib.parse.urlencode(params,
+                                                                      quote_via=urllib.parse.quote))
 
                 if r.status_code == 404:
                     raise ApeyeObjectNotFound("Object not found. Tried: %s. "
