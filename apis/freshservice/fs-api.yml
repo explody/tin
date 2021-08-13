@@ -1,0 +1,17 @@
+classes:
+  assets:
+    list:
+      method:   GET
+      path:     /assets/
+    get:
+      method:   GET
+      path:     /assets/:id
+    search:
+      method:   GET
+      path:     /assets
+    create:
+      method:   POST
+      path:     /assets
+    update:
+      method:   PUT
+      path:     /assets/:id

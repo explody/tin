@@ -76,7 +76,7 @@ class ApeyeConfig(object):
         self.confpath = self.find_config(conffile)
         logger.info("Using config: % s Environment: %s" % (self.confpath, environ))
         fh = open(self.confpath, "rb")
-        conf = yaml.load(fh.read())
+        conf = yaml.safe_load(fh.read())
 
         # Add the directory of the file we just loaded to confpaths
         self.confpaths.append(os.path.dirname(os.path.abspath(self.confpath)))
@@ -95,6 +95,8 @@ class ApeyeConfig(object):
 
         if 'headers' in conf:
             self.headers.update(conf['headers'])
+
+        self.set('use_session', conf.get('use_session', True))
 
         env_attrs = conf['environments'][apeye_env]
 
@@ -123,11 +125,11 @@ class ApeyeConfig(object):
             dict: Contents of the file parsed to a dict
         """
 
-        fh = open(fpath, "rb")
-        if fpath.endswith('.yml'):
-            return yaml.load(fh.read())
-        elif fpath.endswith('.json'):
-            return json.loads(fh.read())
+        with open(fpath, "rb") as fh:
+            if fpath.endswith('.yml'):
+                return yaml.safe_load(fh.read())
+            elif fpath.endswith('.json'):
+                return json.loads(fh.read())
 
     def set(self, key, value):
         """Config attribute setter

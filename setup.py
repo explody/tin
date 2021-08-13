@@ -31,5 +31,5 @@ setup(
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: BSD License",
     ],
-    data_files = data_files
+    data_files=data_files
 )

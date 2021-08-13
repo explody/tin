@@ -1,0 +1,19 @@
+environments:
+  production:
+    host: kbox.vant.com
+    scheme: https
+    port: 443
+    credfile: production.yml
+    authtype: none
+    use_session: true
+    ssl:
+        verify: true
+    apifile: kace-api.yml
+
+
+# Common settings apply to all environments
+common:
+  type: "application/json"
+  basepath: "/api"
+  params:
+    may: ["links","filter_by","filter_value"]
