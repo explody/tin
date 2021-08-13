@@ -1,0 +1,10 @@
+classes:
+  security:
+    login:
+      method:   POST
+      path:     /ams/shared/api/security/login
+      nobase:   true
+  asset:
+    assets:
+      method:   GET
+      path:     /asset/assets/

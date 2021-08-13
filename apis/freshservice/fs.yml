@@ -1,0 +1,19 @@
+environments:
+  production:
+    host: roivant.freshservice.com
+    scheme: https
+    port: 443
+    credfile: production.yml
+    authtype: basic
+    ssl:
+        verify: true
+    apifile: fs-api.yml
+    objfile: fs-models.yml
+
+
+# Common settings apply to all environments
+common:
+  type: "application/json"
+  basepath: "/api/v2"
+  params:
+    may: ["links","filter_by","filter_value"]
