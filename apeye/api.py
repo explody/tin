@@ -1,10 +1,8 @@
 import pprint
 import re
-import collections
 import requests
 import urllib
 import simplejson as json
-from six import iteritems
 
 from . import ApeyeConfig, ApeyeError
 
@@ -156,21 +154,8 @@ class ApeyeApiMethod(object):
         else:
             self.expect_return = [200]
 
-        # Here, we handle parameters defined as 'must' or 'may'
-        self.must = []
-        self.may = []
         self.default_params = {}
         self.default_tokens = {}
-
-        if hasattr(self.api.conf, "params"):
-            self.may += self.api.conf.params.get("may", [])
-            self.must += self.api.conf.params.get("must", [])
-
-        if "must" in self._md:
-            self.must = self._md["must"]
-
-        if "may" in self._md:
-            self.may += self._md["may"]
 
         # Start with default parameters for the api and method, if they exist
         if hasattr(self.api.conf, "default_params"):
@@ -186,9 +171,6 @@ class ApeyeApiMethod(object):
 
         if "default_tokens" in self._md:
             self.default_tokens.update(self._md["default_tokens"])
-
-        self.may = list(set(self.may))
-        self.must = list(set(self.must))
 
         self.url = "%s://%s:%s%s" % (
             self.api.conf.scheme,
@@ -257,7 +239,7 @@ class ApeyeApiMethod(object):
                 )
 
         # Presence of our path tokens is verified. Replace them in our url
-        for k, v in iteritems(tokens):
+        for k, v in tokens.items():
             if self.api.conf.apidata.get("swagger", False):
                 url = url.replace("{%s}" % k, str(v))
             else:
@@ -431,7 +413,7 @@ class ApeyeApi(ApeyeApiClass):
 
             self.tokenre = re.compile("{([a-zA-Z0-9_-]+)}")
 
-            for path, pdata in iteritems(self.conf.apidata["paths"]):
+            for path, pdata in self.conf.apidata["paths"].items():
 
                 # If there is a base path specified, remove it from the path string we're working on
                 mpath = (
@@ -444,7 +426,7 @@ class ApeyeApi(ApeyeApiClass):
                 mpath = mpath.strip("/")
                 mparts = mpath.split("/")
 
-                for hmth, hmthdata in iteritems(pdata):
+                for hmth, hmthdata in pdata.items():
                     # The mangling here is specifically for django-rest-swagger,
                     # to try and build a sane method path
                     if hmthdata["operationId"]:
@@ -474,7 +456,7 @@ class ApeyeApi(ApeyeApiClass):
         else:
             self.tokenre = re.compile(":([a-zA-Z0-9_-]+)")
             # loop through the classes in okta-api.yml
-            for cls, mths in iteritems(self.conf.apidata["classes"]):
+            for cls, mths in self.conf.apidata["classes"].items():
 
                 # Each top level class name will be an ApeyeApiClass
                 new_type = type(cls, (ApeyeApiClass,), {})
@@ -482,7 +464,7 @@ class ApeyeApi(ApeyeApiClass):
 
                 # For each defined method, add an ApeyeApiMethod as
                 # an attribute in the ApeyeApiClass instance
-                for mth, data in iteritems(mths):
+                for mth, data in mths.items():
                     setattr(new_cls, mth, ApeyeApiMethod(self, new_cls, mth, data))
                     new_cls.add_method(mth)
 

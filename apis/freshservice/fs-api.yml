@@ -1,5 +1,6 @@
-classes:
-  assets:
+
+assets:
+  methods:
     list:
       method:   GET
       path:     /assets/
@@ -15,3 +16,55 @@ classes:
     update:
       method:   PUT
       path:     /assets/:id
+solutions:
+  category:
+    methods:
+      list:
+        method: GET
+        path: /solutions/categories
+      get:
+        method: GET
+        path: /solutions/categories/:id
+      create:
+        method: POST
+        path: /solutions/categories
+      update:
+        method: PUT
+        path: /solutions/categories/:id
+      delete:
+        method: PUT
+        path: /solutions/categories/:id
+    folder:
+      methods:
+        list:
+          method: GET
+          path: /solutions/folders
+        get:
+          method: GET
+          path: /solutions/folders/:id
+        create:
+          method: POST
+          path: /solutions/folders
+        update:
+          method: PUT
+          path: /solutions/folders/:id
+        delete:
+          method: PUT
+          path: /solutions/folders/:id
+    article:
+      methods:
+        list:
+          method: GET
+          path: /solutions/articles
+        get:
+          method: GET
+          path: /solutions/articles/:id
+        create:
+          method: POST
+          path: /solutions/articles
+        update:
+          method: PUT
+          path: /solutions/articles/:id
+        delete:
+          method: PUT
+          path: /solutions/articles/:id

@@ -8,3 +8,7 @@ classes:
     assets:
       method:   GET
       path:     /asset/assets/
+  inventory:
+    machines:
+      method:   GET
+      path:     /inventory/machines

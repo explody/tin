@@ -3,7 +3,7 @@ environments:
     host: roivant.freshservice.com
     scheme: https
     port: 443
-    credfile: production.yml
+    credfile: ~/.apeye/apis/freshservice/production.yml
     authtype: basic
     ssl:
         verify: true

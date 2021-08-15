@@ -3,7 +3,7 @@ environments:
     host: kbox.vant.com
     scheme: https
     port: 443
-    credfile: production.yml
+    credfile: ~/.apeye/apis/kace/production.yml
     authtype: none
     use_session: true
     ssl:
