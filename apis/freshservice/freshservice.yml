@@ -7,8 +7,8 @@ environments:
     authtype: basic
     ssl:
         verify: true
-    apifile: fs-api.yml
-    modelfile: fs-models.yml
+    apifile: freshservice-api.yml
+    modelfile: freshservice-models.yml
 
 
 # Common settings apply to all environments
