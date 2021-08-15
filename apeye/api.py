@@ -87,6 +87,8 @@ class ApeyeApiModel(dict):
     def __init__(self, data={}):
         if data:
             self.validate(data)
+        self._response_data = {}
+        self._response = None
         super().__init__(data)
 
     def validate(self, data):
@@ -101,6 +103,22 @@ class ApeyeApiModel(dict):
 
     def popitem(self):
         pass
+
+    @property
+    def raw(self):
+        return self._response_data
+
+    @raw.setter
+    def raw(self, response_data):
+        self._response_data = response_data
+
+    @property
+    def response(self):
+        return self._response
+
+    @response.setter
+    def response(self, response):
+        self._response = response
 
     def to_json(self):
         """Returns self as JSON"""
@@ -158,29 +176,14 @@ class ApeyeApiResponseDict(ApeyeApiResponse, dict):
         ApeyeApiResponse.__init__(self, response_data, response)
 
         new_data = dict(response_data)
-        print(dir(method))
-        print(dir(method.cls))
-        if hasattr(method.cls, "response_list_path"):
-            print("HERE1")
 
-        if getattr(method, "singleton", False):
-            print("HERE2")
-            if (
-                hasattr(method.cls, "response_single_path")
-                and getattr(method.cls, "response_single_path") in response_data
-            ):
-                new_data = method.cls.model(new_data[method.cls.response_single_path])
-            else:
-                new_data = method.cls.model(new_data)
-
-        elif (
+        if (
             hasattr(method.cls, "response_list_path")
             and getattr(method.cls, "response_list_path") in response_data
         ):
 
             new_data[method.cls.response_list_path] = []
             object_data = response_data[method.cls.response_list_path]
-            print("HERE3")
             for obj in object_data:
                 new_data[method.cls.response_list_path].append(method.cls.model(obj))
 
@@ -194,13 +197,26 @@ class ApeyeApiResponseString(str, ApeyeApiResponse):
 
 
 class ApeyeApiResponseFactory(object):
-    def __call__(self, response, request, method):
-        if isinstance(response, list):
-            return ApeyeApiResponseList(response, request, method)
-        elif isinstance(response, dict):
-            return ApeyeApiResponseDict(response, request, method)
+    def __call__(self, response_data, response, method):
+        if getattr(method, "singleton", False):
+            if (
+                hasattr(method.cls, "response_single_path")
+                and getattr(method.cls, "response_single_path") in response_data
+            ):
+                model_instance = method.cls.model(response_data[method.cls.response_single_path])
+            else:
+                model_instance = method.cls.model(response_data)
+                
+            model_instance.raw = response_data
+            model_instance.response = response
+            return model_instance
+
+        if isinstance(response_data, list):
+            return ApeyeApiResponseList(response_data, response, method)
+        elif isinstance(response_data, dict):
+            return ApeyeApiResponseDict(response_data, response, method)
         else:
-            return ApeyeApiResponseString(response, request, method)
+            return ApeyeApiResponseString(response_data, response, method)
 
 
 class ApeyeApiMethod(object):
@@ -228,6 +244,8 @@ class ApeyeApiMethod(object):
         self._md = method_data
 
         self.method = self._md["method"]
+        self.object_method = self._md.get("object_method", None)
+        self.singleton = self._md.get("singleton", False)
 
         if self._md.get("nobase", False):
             self.path = self._md["path"]
@@ -586,7 +604,10 @@ class ApeyeApi(ApeyeApiClass):
                     # If there is an associated model, it will get the same methods
                     # as the parent class
                     if hasattr(new_type, "model"):
-                        setattr(new_type.model, mth, new_method)
+                        # Only add methods to the object model that are explicitly labeled as
+                        # object methods
+                        if 'object_method' in mth_data:
+                            setattr(new_type.model, mth, new_method)
 
                     new_obj.add_method(mth)
 

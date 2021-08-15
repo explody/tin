@@ -29,6 +29,7 @@ solutions:
         method: GET
         path: /solutions/categories/:id
         singleton: true
+        object_method: read
       create:
         method: POST
         path: /solutions/categories
