@@ -8,7 +8,7 @@ environments:
     ssl:
         verify: true
     apifile: fs-api.yml
-    objfile: fs-models.yml
+    modelfile: fs-models.yml
 
 
 # Common settings apply to all environments

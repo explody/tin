@@ -11,12 +11,17 @@ class ApeyeObjectNotFound(ApeyeError):
     """Exception thrown for 404 errors"""
 
     def __init__(self, value):
-        super(ApeyeObjectNotFound, self).__init__(value)
+        super().__init__(value)
 
 
 class ApeyeInvalidArgs(Exception):
     def __init__(self, value):
-        super(ApeyeInvalidArgs, self).__init__(value)
+        super().__init__(value)
+
+
+class ApeyeModelError(ApeyeError):
+    def __init__(self, value):
+        super().__init__(value)
 
 
 class ApeyeApiClass(object):
@@ -78,6 +83,30 @@ class ApeyeApiClass(object):
         return json.dumps(self._recurse(self, True))
 
 
+class ApeyeApiModel(dict):
+    def __init__(self, data={}):
+        if data:
+            self.validate(data)
+        super().__init__(data)
+
+    def validate(self, data):
+        for required_attr in self.must:
+            if required_attr not in data:
+                raise ApeyeModelError(
+                    "Required attribute {} not present".format(required_attr)
+                )
+
+    def pop(self, key):
+        return self[key]
+
+    def popitem(self):
+        pass
+
+    def to_json(self):
+        """Returns self as JSON"""
+        return json.dumps(self)
+
+
 class HTTPGenericHeaderAuth(requests.auth.AuthBase):
     """Small custom extension of requests auth, for passing auth info in headers"""
 
@@ -100,14 +129,78 @@ class HTTPGenericParameterAuth(requests.auth.AuthBase):
         return r
 
 
-class ApeyeApiResponse(dict):
-    def __init__(self, *args, **kwargs):
-        self._request = kwargs.pop("request") if "request" in kwargs else None
-        super().__init__(*args, **kwargs)
+class ApeyeApiResponse(object):
+    def __init__(self, response_data, response):
+        self._response = response
+        self._response_data = response_data
 
     @property
-    def request(self):
-        return self._request
+    def response(self):
+        return self._response
+
+    @property
+    def response_data(self):
+        return self._response_data
+
+    @property
+    def raw(self):
+        return self._response_data
+
+
+class ApeyeApiResponseList(list, ApeyeApiResponse):
+    def __init__(self, response_data, response, api):
+        super().__init__(response_data, response, api)
+
+
+class ApeyeApiResponseDict(ApeyeApiResponse, dict):
+    def __init__(self, response_data, response, method):
+
+        ApeyeApiResponse.__init__(self, response_data, response)
+
+        new_data = dict(response_data)
+        print(dir(method))
+        print(dir(method.cls))
+        if hasattr(method.cls, "response_list_path"):
+            print("HERE1")
+
+        if getattr(method, "singleton", False):
+            print("HERE2")
+            if (
+                hasattr(method.cls, "response_single_path")
+                and getattr(method.cls, "response_single_path") in response_data
+            ):
+                new_data = method.cls.model(new_data[method.cls.response_single_path])
+            else:
+                new_data = method.cls.model(new_data)
+
+        elif (
+            hasattr(method.cls, "response_list_path")
+            and getattr(method.cls, "response_list_path") in response_data
+        ):
+
+            new_data[method.cls.response_list_path] = []
+            object_data = response_data[method.cls.response_list_path]
+            print("HERE3")
+            for obj in object_data:
+                new_data[method.cls.response_list_path].append(method.cls.model(obj))
+
+        dict.__init__(self, new_data)
+        # super().__init__(response_data, response, method)
+
+
+class ApeyeApiResponseString(str, ApeyeApiResponse):
+    def __init__(self, response_data, response, api):
+        super().__init__(response_data, response, api)
+
+
+class ApeyeApiResponseFactory(object):
+    def __call__(self, response, request, method):
+        if isinstance(response, list):
+            return ApeyeApiResponseList(response, request, method)
+        elif isinstance(response, dict):
+            return ApeyeApiResponseDict(response, request, method)
+        else:
+            return ApeyeApiResponseString(response, request, method)
 
 
 class ApeyeApiMethod(object):
@@ -245,11 +338,11 @@ class ApeyeApiMethod(object):
                 url = url.replace(":%s" % k, str(v))
 
         try:
-            resp = None
+            response_data = None
             response_count = {}
             while True:
                 if self.method == "GET":
-                    r = self.api.request.get(
+                    response = self.api.request.get(
                         url,
                         headers=self.api.headers,
                         auth=self.api.auth,
@@ -259,7 +352,7 @@ class ApeyeApiMethod(object):
                         ),
                     )
                 elif self.method == "OPTIONS":
-                    r = self.api.request.options(
+                    response = self.api.request.options(
                         url,
                         headers=self.api.headers,
                         auth=self.api.auth,
@@ -269,7 +362,7 @@ class ApeyeApiMethod(object):
                         ),
                     )
                 elif self.method == "POST":
-                    r = self.api.request.post(
+                    response = self.api.request.post(
                         url,
                         data=json.dumps(data),
                         headers=self.api.headers,
@@ -280,7 +373,7 @@ class ApeyeApiMethod(object):
                         ),
                     )
                 elif self.method == "PATCH":
-                    r = self.api.request.patch(
+                    response = self.api.request.patch(
                         url,
                         data=json.dumps(data),
                         headers=self.api.headers,
@@ -291,7 +384,7 @@ class ApeyeApiMethod(object):
                         ),
                     )
                 elif self.method == "PUT":
-                    r = self.api.request.put(
+                    response = self.api.request.put(
                         url,
                         data=json.dumps(data),
                         headers=self.api.headers,
@@ -302,7 +395,7 @@ class ApeyeApiMethod(object):
                         ),
                     )
                 elif self.method == "DELETE":
-                    r = self.api.request.delete(
+                    response = self.api.request.delete(
                         url,
                         data=json.dumps(data),
                         headers=self.api.headers,
@@ -313,34 +406,36 @@ class ApeyeApiMethod(object):
                         ),
                     )
 
-                if r.status_code == 404:
+                if response.status_code == 404:
                     raise ApeyeObjectNotFound(
-                        "Object not found. Tried: %s. " "Apeye says: %s" % (url, r.text)
+                        "Object not found. Tried: %s. "
+                        "Apeye says: %s" % (url, response.text)
                     )
-                elif r.status_code not in self.expect_return:
+                elif response.status_code not in self.expect_return:
                     raise ApeyeError(
                         "ERROR at %s Got return code %s, expected %s. Apeye says: %s"
                         % (
                             url,
-                            r.status_code,
+                            response.status_code,
                             ",".join([str(r) for r in self.expect_return]),
-                            r.text,
+                            response.text,
                         )
                     )
 
                 try:
-                    thisresp = r.json()
+                    current_response_data = response.json()
                 except Exception as e:
                     raise ApeyeError(
-                        "ERROR decoding response JSON. " "Raw response is: %s" % r.text
+                        "ERROR decoding response JSON. "
+                        "Raw response is: %s" % response.text
                     )
 
-                if isinstance(resp, list):
-                    resp.extend(thisresp)
-                elif isinstance(resp, dict):
-                    resp.update(thisresp)
+                if isinstance(response_data, list):
+                    response_data.extend(current_response_data)
+                elif isinstance(response_data, dict):
+                    response_data.update(current_response_data)
                 else:
-                    resp = thisresp
+                    response_data = current_response_data
 
                 # Handle pagination types
                 # "header_count" expects a total passed over in the HTTP header
@@ -348,12 +443,12 @@ class ApeyeApiMethod(object):
                 if (hasattr(self.api.conf, "pagination")) and (
                     self.api.conf.pagination["type"] == "header_count"
                 ):
-                    header_count = r.headers.get(
+                    header_count = response.headers.get(
                         self.api.conf.pagination["header"], "0"
                     )  # if the specified header doesn't exist, assume 0 addt'l pages
 
-                    response_count["current"] = len(thisresp)
-                    response_count["total"] = len(resp)
+                    response_count["current"] = len(current_response_data)
+                    response_count["total"] = len(response_data)
 
                     # If we haven't fetched all the records, set the config'd
                     # path or params then continue
@@ -372,15 +467,16 @@ class ApeyeApiMethod(object):
                         break
 
                 else:
-                    if "next" not in r.links:
+                    if "next" not in response.links:
                         break
                     else:
-                        url = r.links["next"]["url"]
+                        url = response.links["next"]["url"]
 
         except requests.exceptions.HTTPError as e:
             raise ApeyeError("ERROR: %s" % e)
 
-        return ApeyeApiResponse(resp, request=r)
+        response_factory = ApeyeApiResponseFactory()
+        return response_factory(response_data, response, self)
 
 
 class ApeyeApi(ApeyeApiClass):
@@ -462,22 +558,44 @@ class ApeyeApi(ApeyeApiClass):
         for cls, cls_data in api_data.items():
 
             new_type = type(cls, (ApeyeApiClass,), {})
-            new_cls = new_type()
 
-            if "methods" in cls_data:
+            if cls_data.get("model"):
+                model_data = self.conf.models.get(cls_data["model"], {})
+                model_type = type(cls_data["model"], (ApeyeApiModel,), model_data)
+                setattr(new_type, "model", model_type)
+
+            for attr in ["response_list_path", "response_single_path"]:
+                if cls_data.get(attr):
+                    setattr(
+                        new_type,
+                        attr,
+                        cls_data.get(attr),
+                    )
+
+            new_obj = new_type()
+
+            if cls_data.get("methods"):
                 # If a child node has 'methods', it's an endpoint
 
                 # For each defined method, add an ApeyeApiMethod as
                 # an attribute in the current ApeyeApiClass instance
                 for mth, mth_data in cls_data["methods"].items():
-                    setattr(obj, mth, ApeyeApiMethod(self, obj, mth, mth_data))
-                    obj.add_method(mth)
+                    new_method = ApeyeApiMethod(self, new_obj, mth, mth_data)
+                    setattr(new_obj, mth, new_method)
+
+                    # If there is an associated model, it will get the same methods
+                    # as the parent class
+                    if hasattr(new_type, "model"):
+                        setattr(new_type.model, mth, new_method)
+
+                    new_obj.add_method(mth)
+
             else:
                 # If there are no methods, it's a container class
-                self._recurse_build_method_path(new_cls, cls_data)
+                self._recurse_build_method_path(new_obj, cls_data)
 
-            setattr(obj, cls, new_cls)
-            obj.add_class(cls, getattr(self, cls))
+            setattr(obj, cls, new_obj)
+            obj.add_class(cls, getattr(obj, cls))
 
     def _swagger_method_data(self, path, mth, mthdata):
         """Constructs a dictionary of data about an ApeyeApiMethod, from swagger data"""

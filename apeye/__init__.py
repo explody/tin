@@ -113,8 +113,15 @@ class ApeyeConfig(object):
             self.credentials = self._loadfile(self.find_config(self.credfile))
 
         # noinspection PyUnresolvedReferences
+        # apifile must be set so don't check, just use it
         apifile = self.find_config(self.apifile)
         self.apidata = self._loadfile(apifile)
+
+        if 'modelfile' in self._api_attrs:
+            modelfile = self.find_config(self.modelfile)
+            self.models = self._loadfile(modelfile)
+        else:
+            self.models = {}
 
     def _loadfile(self, fpath):
         """Parses the conf file as YAML or JSON based on file extension
@@ -162,7 +169,6 @@ class ApeyeConfig(object):
         
         # expanduser here in case someone passed a "~" path
         filename = os.path.expanduser(filename)
-        print("here", filename)
 
         if os.path.isfile(filename):
             return os.path.abspath(filename)
@@ -172,5 +178,4 @@ class ApeyeConfig(object):
             if os.path.isfile(confpath):
                 return confpath
 
-        print("UH OH")
         raise ApeyeConfigNotFound(filename, self.confpaths)
