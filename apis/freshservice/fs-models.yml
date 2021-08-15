@@ -1,0 +1,8 @@
+category:
+  must:
+    - name
+  read:
+    - id
+    - position
+    - default_category
+
