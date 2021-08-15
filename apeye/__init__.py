@@ -115,7 +115,6 @@ class ApeyeConfig(object):
         # noinspection PyUnresolvedReferences
         apifile = self.find_config(self.apifile)
         self.apidata = self._loadfile(apifile)
-        pprint.pp(self.apidata)
 
     def _loadfile(self, fpath):
         """Parses the conf file as YAML or JSON based on file extension

@@ -101,9 +101,8 @@ class HTTPGenericParameterAuth(requests.auth.AuthBase):
 
 
 class ApeyeApiResponse(dict):
-
     def __init__(self, *args, **kwargs):
-        self._request = kwargs.pop('request') if 'request' in kwargs else None
+        self._request = kwargs.pop("request") if "request" in kwargs else None
         super().__init__(*args, **kwargs)
 
     @property
@@ -137,10 +136,10 @@ class ApeyeApiMethod(object):
 
         self.method = self._md["method"]
 
-        if self._md.get('nobase', False):
+        if self._md.get("nobase", False):
             self.path = self._md["path"]
         else:
-            self.path = '{}{}'.format(self.api.conf.basepath, self._md["path"])
+            self.path = "{}{}".format(self.api.conf.basepath, self._md["path"])
 
         # If the method specifies an expected return code, grab it, otherwise
         # default to 200
@@ -250,7 +249,6 @@ class ApeyeApiMethod(object):
             response_count = {}
             while True:
                 if self.method == "GET":
-                    print(self.api.headers)
                     r = self.api.request.get(
                         url,
                         headers=self.api.headers,
@@ -446,7 +444,9 @@ class ApeyeApi(ApeyeApiClass):
                             "/%s" % mpath, hmth, hmthdata
                         )
 
-                        self._recurse_build_method_path(self, mthpath, mthname, mthdata)
+                        self._recurse_build_method_path_swagger(
+                            self, mthpath, mthname, mthdata
+                        )
                     else:
                         print(
                             "Swagger definitions with operationId's are not currently supported"
@@ -455,22 +455,29 @@ class ApeyeApi(ApeyeApiClass):
 
         else:
             self.tokenre = re.compile(":([a-zA-Z0-9_-]+)")
-            # loop through the classes in okta-api.yml
-            for cls, mths in self.conf.apidata["classes"].items():
+            self._recurse_build_method_path(self, self.conf.apidata)
 
-                # Each top level class name will be an ApeyeApiClass
-                new_type = type(cls, (ApeyeApiClass,), {})
-                new_cls = new_type()
+    def _recurse_build_method_path(self, obj, api_data):
+
+        for cls, cls_data in api_data.items():
+
+            new_type = type(cls, (ApeyeApiClass,), {})
+            new_cls = new_type()
+
+            if "methods" in cls_data:
+                # If a child node has 'methods', it's an endpoint
 
                 # For each defined method, add an ApeyeApiMethod as
-                # an attribute in the ApeyeApiClass instance
-                for mth, data in mths.items():
-                    setattr(new_cls, mth, ApeyeApiMethod(self, new_cls, mth, data))
-                    new_cls.add_method(mth)
+                # an attribute in the current ApeyeApiClass instance
+                for mth, mth_data in cls_data["methods"].items():
+                    setattr(obj, mth, ApeyeApiMethod(self, obj, mth, mth_data))
+                    obj.add_method(mth)
+            else:
+                # If there are no methods, it's a container class
+                self._recurse_build_method_path(new_cls, cls_data)
 
-                setattr(self, cls, new_cls)
-
-                self.add_class(cls, getattr(self, cls))
+            setattr(obj, cls, new_cls)
+            obj.add_class(cls, getattr(self, cls))
 
     def _swagger_method_data(self, path, mth, mthdata):
         """Constructs a dictionary of data about an ApeyeApiMethod, from swagger data"""
@@ -481,7 +488,9 @@ class ApeyeApi(ApeyeApiClass):
             "return": list(mthdata["responses"].keys()),
         }
 
-    def _recurse_build_method_path(self, obj, paths, mth, mthdata, objpath=None):
+    def _recurse_build_method_path_swagger(
+        self, obj, paths, mth, mthdata, objpath=None
+    ):
         """Builds a hierarchy of objects representing the paths to the REST endpoints
 
         The ApeyeApiClass instances are effectively containers. Given an array that represents
@@ -520,7 +529,7 @@ class ApeyeApi(ApeyeApiClass):
         # If there are remaining path items, recurse, passing the child object (this_obj)
         # as the starting point, and constructing the objpath as we go.
         if len(paths[1:]) > 0:
-            self._recurse_build_method_path(
+            self._recurse_build_method_path_swagger(
                 this_obj, paths[1:], mth, mthdata, ".".join(paths[0:2])
             )
         else:
