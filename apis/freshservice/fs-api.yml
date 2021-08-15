@@ -17,7 +17,10 @@ assets:
       method:   PUT
       path:     /assets/:id
 solutions:
-  category:
+  categories:
+    model: category
+    response_list_path: "categories"
+    response_single_path: "category"
     methods:
       list:
         method: GET
@@ -25,46 +28,52 @@ solutions:
       get:
         method: GET
         path: /solutions/categories/:id
+        singleton: true
       create:
         method: POST
         path: /solutions/categories
+        object_method: create
       update:
         method: PUT
         path: /solutions/categories/:id
+        object_method: update
       delete:
         method: PUT
         path: /solutions/categories/:id
-    folder:
-      methods:
-        list:
-          method: GET
-          path: /solutions/folders
-        get:
-          method: GET
-          path: /solutions/folders/:id
-        create:
-          method: POST
-          path: /solutions/folders
-        update:
-          method: PUT
-          path: /solutions/folders/:id
-        delete:
-          method: PUT
-          path: /solutions/folders/:id
-    article:
-      methods:
-        list:
-          method: GET
-          path: /solutions/articles
-        get:
-          method: GET
-          path: /solutions/articles/:id
-        create:
-          method: POST
-          path: /solutions/articles
-        update:
-          method: PUT
-          path: /solutions/articles/:id
-        delete:
-          method: PUT
-          path: /solutions/articles/:id
+        object_method: delete
+  folders:
+    model: folder
+    response_object_path: "folders"
+    methods:
+      list:
+        method: GET
+        path: /solutions/folders
+      get:
+        method: GET
+        path: /solutions/folders/:id
+      create:
+        method: POST
+        path: /solutions/folders
+      update:
+        method: PUT
+        path: /solutions/folders/:id
+      delete:
+        method: PUT
+        path: /solutions/folders/:id
+  articles:
+    methods:
+      list:
+        method: GET
+        path: /solutions/articles
+      get:
+        method: GET
+        path: /solutions/articles/:id
+      create:
+        method: POST
+        path: /solutions/articles
+      update:
+        method: PUT
+        path: /solutions/articles/:id
+      delete:
+        method: PUT
+        path: /solutions/articles/:id
