@@ -5,7 +5,7 @@ import simplejson as json
 
 from apeye.auth import HTTPGenericHeaderAuth, HTTPGenericParameterAuth
 from apeye.config import ApeyeConfig
-from apeye.exceptions import ApeyeInvalidArgs
+from apeye.exceptions import ApeyeInvalidArgs, ApeyeError
 from apeye.models import ApeyeApiModel
 from apeye.response import ApeyeApiResponseFactory
 
@@ -28,7 +28,8 @@ class ApeyeApiClass(object):
     def set_path(self, objpath):
         self._objpath = objpath
 
-    def add_method(self, name):
+    def add_method(self, name, method):
+        setattr(self, name, method)
         self._methods.append(name)
 
     def add_class(self, name, cls):
@@ -93,55 +94,8 @@ class ApeyeApi(ApeyeApiClass):
 
         self._session = requests.Session() if self.conf.use_session else None
 
-        if self.conf.apidata.get("swagger", False):
-
-            self.tokenre = re.compile("{([a-zA-Z0-9_-]+)}")
-
-            for path, pdata in self.conf.apidata["paths"].items():
-
-                # If there is a base path specified, remove it from the path string we're working on
-                mpath = (
-                    re.sub("^%s" % self.conf.basepath, "", path)
-                    if self.conf.basepath
-                    else path
-                )
-
-                # Remove leading and trailing slashes so we split cleanly
-                mpath = mpath.strip("/")
-                mparts = mpath.split("/")
-
-                for hmth, hmthdata in pdata.items():
-                    # The mangling here is specifically for django-rest-swagger,
-                    # to try and build a sane method path
-                    if hmthdata["operationId"]:
-
-                        mthname = hmthdata["operationId"]
-
-                        # based on the way that django-rest-swagger generates operationId's
-                        # trim them from left to right to remove the redundant path strings
-                        mthpath = []
-                        for part in mparts:
-                            if self.tokenre.match(part):
-                                continue
-                            mthpath.append(part)
-                            mthname = re.sub("^%s_" % part, "", mthname)
-
-                        mthdata = self._swagger_method_data(
-                            "/%s" % mpath, hmth, hmthdata
-                        )
-
-                        self._recurse_build_method_path_swagger(
-                            self, mthpath, mthname, mthdata
-                        )
-                    else:
-                        print(
-                            "Swagger definitions with operationId's are not currently supported"
-                        )
-                        sys.exit()
-
-        else:
-            self.tokenre = re.compile(":([a-zA-Z0-9_-]+)")
-            self._recurse_build_method_path(self, self.conf.apidata)
+        self.tokenre = re.compile(":([a-zA-Z0-9_-]+)")
+        self._recurse_build_method_path(self, self.conf.apidata)
 
     def _recurse_build_method_path(self, obj, api_data):
 
@@ -171,7 +125,7 @@ class ApeyeApi(ApeyeApiClass):
                 # an attribute in the current ApeyeApiClass instance
                 for mth, mth_data in cls_data["methods"].items():
                     new_method = ApeyeApiMethod(self, new_obj, mth, mth_data)
-                    setattr(new_obj, mth, new_method)
+                    new_obj.add_method(mth, new_method)
 
                     # If there is an associated model, it will get the same methods
                     # as the parent class
@@ -181,72 +135,12 @@ class ApeyeApi(ApeyeApiClass):
                         if "object_method" in mth_data:
                             setattr(new_type.model, mth, new_method)
 
-                    new_obj.add_method(mth)
-
             else:
                 # If there are no methods, it's a container class
                 self._recurse_build_method_path(new_obj, cls_data)
 
             setattr(obj, cls, new_obj)
             obj.add_class(cls, getattr(obj, cls))
-
-    def _swagger_method_data(self, path, mth, mthdata):
-        """Constructs a dictionary of data about an ApeyeApiMethod, from swagger data"""
-
-        return {
-            "method": mth.upper(),
-            "path": path,
-            "return": list(mthdata["responses"].keys()),
-        }
-
-    def _recurse_build_method_path_swagger(
-        self, obj, paths, mth, mthdata, objpath=None
-    ):
-        """Builds a hierarchy of objects representing the paths to the REST endpoints
-
-        The ApeyeApiClass instances are effectively containers. Given an array that represents
-        the components of an endpoint path. e.g. /path/to/endpoint == ['path', 'to', 'endpoint']
-        and an initial container object, this would produce a hierarchy of objects/attributes with
-        a method at the end.
-
-        path.to.endpoint (ApeyeApiClass.ApeyeApiClass.ApeyeApiMethod)
-
-        With the intention of the final endpoint will contain one or more ApeyeApiMethod attributes
-
-        Args:
-            obj (ApeyeApiClass): The object in which to add the next attribute
-            paths (list): A list of strings that represent the path/object hierarchy
-            mth (str): The name of the method
-            mthdata (dict): A set of data about the method
-            objpath (str): The full object path as a string. e.g. "path.to.endpoint"
-        """
-        current = paths[0].replace("-", "_")
-
-        # If no objpath is given, we're at the firs element of the paths list
-        if objpath is None:
-            objpath = current
-
-        # As this is intended to be run multiple times with multiple path lists, see if the current
-        # object already has the first element created and if so, use that. Otherwise create a
-        # new type object which inherits from ApeyeApiClass
-        if hasattr(obj, current):
-            this_obj = getattr(obj, current)
-        else:
-            new_type = type(current, (ApeyeApiClass,), {})
-            this_obj = new_type(objpath)
-            setattr(obj, current, this_obj)
-            obj.add_class(current, getattr(obj, current))
-
-        # If there are remaining path items, recurse, passing the child object (this_obj)
-        # as the starting point, and constructing the objpath as we go.
-        if len(paths[1:]) > 0:
-            self._recurse_build_method_path_swagger(
-                this_obj, paths[1:], mth, mthdata, ".".join(paths[0:2])
-            )
-        else:
-            # If there are no further path elements, create the method on this_obj
-            setattr(this_obj, mth, ApeyeApiMethod(self, this_obj, mth, mthdata))
-            this_obj.add_method(mth)
 
     @property
     def request(self):
@@ -275,9 +169,10 @@ class ApeyeApi(ApeyeApiClass):
         """Returns a requests auth instance based on the api config"""
 
         if self.conf.authtype == "basic":
-            u = self.conf.credentials.get("username", None)
-            p = self.conf.credentials.get("password", None)
-            return requests.auth.HTTPBasicAuth(u, p)
+            return requests.auth.HTTPBasicAuth(
+                self.conf.credentials.get("username", None),
+                self.conf.credentials.get("password", None),
+            )
         elif self.conf.authtype == "header":
             return HTTPGenericHeaderAuth(self.conf.credentials)
         elif self.conf.authtype == "param":
@@ -417,10 +312,7 @@ class ApeyeApiMethod(object):
 
         # Presence of our path tokens is verified. Replace them in our url
         for k, v in tokens.items():
-            if self.api.conf.apidata.get("swagger", False):
-                url = url.replace("{%s}" % k, str(v))
-            else:
-                url = url.replace(":%s" % k, str(v))
+            url = url.replace(":%s" % k, str(v))
 
         try:
             response_data = None

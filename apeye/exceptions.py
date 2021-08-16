@@ -11,8 +11,8 @@ class ApeyeError(Exception):
 class ApeyeConfigNotFound(Exception):
     """Config file not found exception"""
 
-    def __init__(self, filename, paths):
-        self.value = "Not found: [" + filename + "] I looked here:" + " ".join(paths)
+    def __init__(self, filename):
+        self.value = "Config not found: {}".format(filename)
 
     def __str__(self):
         return self.value
