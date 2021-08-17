@@ -9,8 +9,8 @@
       "ssl": {
         "verify": true
       },
-      "apifile": "test-api.yml",
-      "modelfile": "test-models.yml"
+      "apifile": "testservice-api.yml",
+      "modelfile": "testservice-models.yml"
     },
     "param": {
       "host": "api.example.com",
@@ -21,8 +21,8 @@
       "ssl": {
         "verify": true
       },
-      "apifile": "test-api.yml",
-      "modelfile": "test-models.yml"
+      "apifile": "testservice-api.yml",
+      "modelfile": "testservice-models.yml"
     },
     "header": {
       "host": "api.example.com",
@@ -33,8 +33,8 @@
       "ssl": {
         "verify": true
       },
-      "apifile": "test-api.yml",
-      "modelfile": "test-models.yml"
+      "apifile": "testservice-api.yml",
+      "modelfile": "testservice-models.yml"
     },
     "no_models": {
       "host": "api.example.com",
@@ -45,7 +45,7 @@
       "ssl": {
         "verify": true
       },
-      "apifile": "test-api.yml"
+      "apifile": "testservice-api.yml"
     }
   },
   "common": {

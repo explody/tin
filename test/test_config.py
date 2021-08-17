@@ -6,15 +6,15 @@ from apeye.exceptions import *
 
 
 def arg_config_yml():
-    return ApeyeConfig("test/data/api/test.yml", "basic")
+    return ApeyeConfig("test/data/api/testservice.yml", "basic")
 
 
 def arg_config_json():
-    return ApeyeConfig("test/data/api/test.json", "basic")
+    return ApeyeConfig("test/data/api/testservice.json", "basic")
 
 
 def env_config():
-    os.environ["APEYE_CONFIG"] = "test/data/api/test.yml"
+    os.environ["APEYE_CONFIG"] = "test/data/api/testservice.yml"
     os.environ["APEYE_ENV"] = "basic"
     ac = ApeyeConfig()
     os.environ.pop("APEYE_CONFIG")
@@ -40,7 +40,7 @@ def test_no_config():
 
 def test_no_environment():
     with pytest.raises(ApeyeError):
-        ApeyeConfig("test/data/api/test.yml", None)
+        ApeyeConfig("test/data/api/testservice.yml", None)
 
 
 def test_bad_config():
@@ -55,11 +55,11 @@ def test_empty_config():
 
 def test_bad_environment():
     with pytest.raises(ApeyeError):
-        ApeyeConfig("test/data/api/test.yml", "nosuchenv")
+        ApeyeConfig("test/data/api/testservice.yml", "nosuchenv")
 
 
 def test_no_models():
-    ac = ApeyeConfig("test/data/api/test.yml", "no_models")
+    ac = ApeyeConfig("test/data/api/testservice.yml", "no_models")
     assert ac.models == {}
 
 
@@ -67,21 +67,21 @@ def test_no_models():
 class TestConfig:
     def test_config_files(self, config):
 
-        assert config.config_file in [os.path.abspath("test/data/api/test.yml"),
-                                      os.path.abspath("test/data/api/test.json")]
-        assert config.apifile == os.path.abspath("test/data/api/test-api.yml")
-        assert config.modelfile == os.path.abspath("test/data/api/test-models.yml")
+        assert config.config_file in [os.path.abspath("test/data/api/testservice.yml"),
+                                      os.path.abspath("test/data/api/testservice.json")]
+        assert config.apifile == os.path.abspath("test/data/api/testservice-api.yml")
+        assert config.modelfile == os.path.abspath("test/data/api/testservice-models.yml")
 
     def test_config_dir(self, config):
         assert config.config_dir == os.path.dirname(
-            os.path.abspath("test/data/api/test.yml")
+            os.path.abspath("test/data/api/testservice.yml")
         )
 
     def test_credentials(self, config):
         assert config.credentials == {'username': 'fakeuser', 'password': 'fakepassword'}
 
     def test_apiname(self, config):
-        assert config.api_name == 'test'
+        assert config.api_name == 'testservice'
 
     def test_environment_values(self, config):
         print(config.config_file)
