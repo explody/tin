@@ -203,46 +203,45 @@ class ApeyeApiMethod(object):
         self.name = name
         self.api = apiobj
         self.cls = clsobj
-        self._md = method_data
+        self._method_data = method_data
 
-        self.method = self._md["method"]
-        self.object_method = self._md.get("object_method", None)
-        self.singleton = self._md.get("singleton", False)
+        self.method = self._method_data["method"]
+        self.object_method = self._method_data.get("object_method", None)
+        self.singleton = self._method_data.get("singleton", False)
 
-        if self._md.get("nobase", False):
-            self.path = self._md["path"]
+        if self._method_data.get("nobase", False):
+            self.path = self._method_data["path"]
         else:
-            self.path = "{}{}".format(self.api.conf.basepath, self._md["path"])
+            self.path = "{}{}".format(self.api.conf.basepath, self._method_data["path"])
 
         # If the method specifies an expected return code, grab it, otherwise
         # default to 200
-        if "return" in self._md:
-            if isinstance(self._md["return"], list):
-                self.expect_return = [int(r) for r in self._md["return"]]
-            elif isinstance(self._md["return"], dict):
-                self.expect_return = [int(r) for r in self._md["return"].keys()]
+        if "return" in self._method_data:
+            if isinstance(self._method_data["return"], list):
+                self.expect_return = [int(r) for r in self._method_data["return"]]
             else:
-                self.expect_return = [self._md["return"]]
+                self.expect_return = [self._method_data["return"]]
         else:
             self.expect_return = [200]
 
-        self.default_params = {}
-        self.default_tokens = {}
+        self.default_params = (
+            self.api.conf.default_params
+            if hasattr(self.api.conf, "default_params")
+            else {}
+        )
+        self.default_tokens = (
+            self.api.conf.default_tokens
+            if hasattr(self.api.conf, "default_tokens")
+            else {}
+        )
 
-        # Start with default parameters for the api and method, if they exist
-        if hasattr(self.api.conf, "default_params"):
-            self.default_params.update(self.api.conf.default_params)
+        # If the method has additional default params, merge them in
+        if "default_params" in self._method_data:
+            self.default_params.update(self._method_data["default_params"])
 
-        if "default_params" in self._md:
-            self.default_params.update(self._md["default_params"])
-            self.may += self._md["default_params"]
-
-        # Start with default path tokens for the api and method, if they exist
-        if hasattr(self.api.conf, "default_tokens"):
-            self.default_tokens.update(self.api.conf.default_tokens)
-
-        if "default_tokens" in self._md:
-            self.default_tokens.update(self._md["default_tokens"])
+        # If the method has additional default tokens, merge them in
+        if "default_tokens" in self._method_data:
+            self.default_tokens.update(self._method_data["default_tokens"])
 
         self.url = "%s://%s:%s%s" % (
             self.api.conf.scheme,
@@ -255,12 +254,12 @@ class ApeyeApiMethod(object):
 
         return json.dumps(
             {
-                "scheme": self.scheme,
-                "host": self.host,
-                "port": self.port,
-                "credentials": self.creds,
+                "scheme": self.api.conf.scheme,
+                "host": self.api.conf.host,
+                "port": self.api.conf.port,
+                "credentials": self.api.conf.credentials,
                 "url": self.url,
-                "method_data": self._md,
+                "method_data": self._method_data,
             }
         )
 

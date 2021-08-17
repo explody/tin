@@ -1,0 +1,81 @@
+---
+hasmethods:
+  methods:
+    list:
+      method:   GET
+      path:     /things/
+      return:   200
+    get:
+      method:   GET
+      path:     /things/:id
+      return:   [200, 201]
+    create:
+      method:   POST
+      path:     /things
+      return:   204
+    update:
+      method:   PUT
+      path:     /things/:id
+      return:   200
+      default_tokens:
+        otherthing: changedstuff
+    delete:
+      method:   DELETE
+      path:     /things/:lots/:of/:tokens/here
+      nobase:   true
+      default_params:
+        confirm: true
+container:
+  subcontainer:
+    model: mymodel
+    response_list_path: "mymodels"
+    response_single_path: "mymodel"
+    methods:
+      list:
+        method: GET
+        path: /stuff/whatnot
+      get:
+        method: GET
+        path: /stuff/whatnot/:id
+        singleton: true
+        object_method: read
+      create:
+        method: POST
+        path: /stuff/whatnot
+        object_method: create
+      update:
+        method: PUT
+        path: /stuff/whatnot/:id
+        object_method: update
+      delete:
+        method: PUT
+        path: /stuff/whatnot/:id
+        object_method: delete
+  subcontainer2:
+    model: othermodel
+    methods:
+      list:
+        method: GET
+        path: /stuff/folders
+      get:
+        method: GET
+        path: /stuff/folders/:id
+      create:
+        method: POST
+        path: /stuff/folders
+      update:
+        method: PUT
+        path: /stuff/folders/:id
+      delete:
+        method: PUT
+        path: /stuff/folders/:id
+    subcontainer3:
+      methods:
+        list:
+          method: GET
+          path: /obscurepath/items
+  nomodel:
+    methods:
+      list:
+        method: GET
+        path: /nomodel/items
