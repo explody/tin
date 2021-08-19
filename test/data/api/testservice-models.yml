@@ -6,3 +6,11 @@ mymodel:
     - name
   may:
     - description
+mymodel_otherid:
+  id_attr: uuid
+  read:
+    - id
+  must:
+    - name
+  may:
+    - description
