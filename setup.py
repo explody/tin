@@ -2,6 +2,7 @@ import os
 import glob
 import pprint
 from setuptools import setup
+from apeye.version import VERSION
 
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
@@ -18,9 +19,9 @@ for directory in directories:
 
 setup(
     name = "apeye",
-    version = "0.3",
+    version = VERSION,
     author = "Mike Culbertson",
-    author_email = "mculbertson@pivotal.io",
+    author_email = "mikeculbertson@protonmail.com",
     description = ("Simple REST API wrapper"),
     license = "BSD",
     keywords = "",
