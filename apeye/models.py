@@ -3,30 +3,6 @@ from apeye.exceptions import ApeyeModelError, ApeyeError
 from deepmerge import always_merger
 import simplejson as json
 
-RESERVED_ATTRS = [
-    "_confirm_i_have_id",
-    "_data",
-    "_obj_path",
-    "_response",
-    "_response_data",
-    "api_method",
-    "basename",
-    "create",
-    "delete",
-    "id",
-    "id_attr",
-    "method_missing",
-    "obj_path",
-    "raw",
-    "refresh",
-    "response",
-    "save",
-    "to_json",
-    "update",
-    "update_from_response",
-    "validate",
-]
-
 
 class ApeyeApiModel(ApeyeApiBase):
 
@@ -42,7 +18,7 @@ class ApeyeApiModel(ApeyeApiBase):
         self._response = None
         self._data = data
 
-        # These aren't really immutables, just their existence is
+        # These aren't really immutables, just their existence is, for __setattr__
         self._immutables = dir(self)
 
         self._initialized = True
@@ -54,11 +30,6 @@ class ApeyeApiModel(ApeyeApiBase):
                 return
 
         super().__setattr__(key, value)
-
-    # def __getattribute__(self, item):
-    #     print('__getattribute__ ', item)
-    #     # Calling the super class to avoid recursion
-    #     return super().__getattribute__(item)
 
     def __getattr__(self, item):
 
@@ -97,8 +68,10 @@ class ApeyeApiModel(ApeyeApiBase):
     def _check_id(self, data):
         if self.id_attr in data:
             if self.id != data[self.id_attr]:
-                raise ApeyeError("Given data has a different ID value ({}) than mine ({}), "
-                                 "cannot load or merge".format(data[self.id_attr], self.id))
+                raise ApeyeError(
+                    "Given data has a different ID value ({}) than mine ({}), "
+                    "cannot load or merge".format(data[self.id_attr], self.id)
+                )
 
     def create(self, data, **kwargs):
 

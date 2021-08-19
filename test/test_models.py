@@ -65,6 +65,14 @@ def test_model_loadmerge_bad_id():
         model.merge({'id': 2, "name": "test"})
 
 
+def test_other_id_attr():
+    testservice = api_inst()
+    instance = testservice.container.subcontainer2.model(
+        {"uuid": "639b410e70fe", "name": "initial name", "description": "initial description"}
+    )
+    assert instance.id == '639b410e70fe'
+
+
 def test_misconfigured_singleton(httpserver: HTTPServer):
     httpserver.expect_request(
         "/api/stuff/whatnot", json={"send": "this"}, method="POST"
@@ -252,7 +260,7 @@ def test_new_model_save(httpserver: HTTPServer):
     assert instance.name == "saved name"
 
 
-def test_modify_unsaved(httpserver: HTTPServer):
+def test_modify_unsaved():
     testservice = api_inst()
     instance = testservice.container.subcontainer.model(
         {"name": "initial name", "description": "initial description"}

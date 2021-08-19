@@ -61,7 +61,7 @@ container:
         object_method: delete
         expect: 204
   subcontainer2:
-    model: othermodel
+    model: mymodel_otherid
     methods:
       list:
         method: GET
