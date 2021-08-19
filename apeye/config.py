@@ -34,24 +34,23 @@ class ApeyeConfig(object):
     def __init__(self, config_file=None, environment=None):
 
         if config_file is None:
-            if 'APEYE_CONFIG' in os.environ:
-                config_file = os.environ.get('APEYE_CONFIG')
+            if "APEYE_CONFIG" in os.environ:
+                config_file = os.environ.get("APEYE_CONFIG")
             else:
                 raise ApeyeError("Config file cannot be None")
 
         if environment is None:
-            if 'APEYE_ENV' in os.environ:
-                environment = os.environ.get('APEYE_ENV')
+            if "APEYE_ENV" in os.environ:
+                environment = os.environ.get("APEYE_ENV")
             else:
                 raise ApeyeError("Environment cannot be None")
-
-        print("ENV", environment)
-        print("FILE", config_file)
 
         self.config_file = self.find_config(config_file)
         self.config_dir = os.path.dirname(self.config_file)
 
-        logger.info("Using config: % s Environment: %s" % (self.config_file, environment))
+        logger.info(
+            "Using config: % s Environment: %s" % (self.config_file, environment)
+        )
 
         conf = self._loadfile(self.config_file)
 
@@ -59,7 +58,9 @@ class ApeyeConfig(object):
             raise ApeyeError("Invalid config (empty?)")
 
         if environment not in conf.get("environments", {}):
-            raise ApeyeError("No such environment is configured: {}".format(environment))
+            raise ApeyeError(
+                "No such environment is configured: {}".format(environment)
+            )
 
         self._api_attrs = conf.get("common", {})
         self.headers = {
@@ -151,7 +152,7 @@ class ApeyeConfig(object):
         if os.path.isabs(filename):
             return filename
         else:
-            if getattr(self, 'config_dir', None):
+            if getattr(self, "config_dir", None):
                 file_in_config_dir = os.path.join(self.config_dir, filename)
                 if os.path.isfile(file_in_config_dir):
                     return os.path.abspath(file_in_config_dir)

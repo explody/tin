@@ -1,13 +1,84 @@
+from apeye.base import ApeyeApiBase
+from apeye.exceptions import ApeyeModelError, ApeyeError
+from deepmerge import always_merger
 import simplejson as json
 
+RESERVED_ATTRS = [
+    "_confirm_i_have_id",
+    "_data",
+    "_obj_path",
+    "_response",
+    "_response_data",
+    "api_method",
+    "basename",
+    "create",
+    "delete",
+    "id",
+    "id_attr",
+    "method_missing",
+    "obj_path",
+    "raw",
+    "refresh",
+    "response",
+    "save",
+    "to_json",
+    "update",
+    "update_from_response",
+    "validate",
+]
 
-class ApeyeApiModel(dict):
+
+class ApeyeApiModel(ApeyeApiBase):
+
+    API_METHODS = {"create": None, "read": None, "update": None, "delete": None}
+
+    id_attr = "id"
+    _initialized = False
+
     def __init__(self, data={}):
-        if data:
-            self.validate(data)
+        ApeyeApiBase.__init__(self)
+
         self._response_data = {}
         self._response = None
-        super().__init__(data)
+        self._data = data
+
+        # These aren't really immutables, just their existence is
+        self._immutables = dir(self)
+
+        self._initialized = True
+
+    def __setattr__(self, key, value):
+        if self._initialized:
+            if key not in self._immutables:
+                self._data[key] = value
+                return
+
+        super().__setattr__(key, value)
+
+    # def __getattribute__(self, item):
+    #     print('__getattribute__ ', item)
+    #     # Calling the super class to avoid recursion
+    #     return super().__getattribute__(item)
+
+    def __getattr__(self, item):
+
+        if item in self._data:
+            return self._data[item]
+        else:
+            if item in self.__dict__:
+                return self.__dict__[item]
+            else:
+                self.method_missing(item)
+
+    def method_missing(self, method_name, *args, **kwargs):
+        e = "type object '%s' has no attribute '%s'" % (
+            self.__class__.__name__,
+            method_name,
+        )
+        raise AttributeError(e)
+
+    def api_method(self, crud_action):
+        return self.API_METHODS.get(crud_action, None)
 
     def validate(self, data):
         for required_attr in self.must:
@@ -16,11 +87,77 @@ class ApeyeApiModel(dict):
                     "Required attribute {} not present".format(required_attr)
                 )
 
-    def pop(self, key):
-        return self[key]
+    def _confirm_i_have_id(self, action):
+        if not self.id:
+            raise ApeyeError(
+                "Attempt to call {}() on an instance that isn't "
+                "saved yet".format(action)
+            )
 
-    def popitem(self):
-        pass
+    def _check_id(self, data):
+        if self.id_attr in data:
+            if self.id != data[self.id_attr]:
+                raise ApeyeError("Given data has a different ID value ({}) than mine ({}), "
+                                 "cannot load or merge".format(data[self.id_attr], self.id))
+
+    def create(self, data, **kwargs):
+
+        if not isinstance(data, dict):
+            raise ApeyeError("Model data must be a dict")
+
+        self.validate(data)
+
+        # Remove any duplicate/conflicting kwargs.  However, don't ignore all kwargs
+        # as there may be other arguments to pass on to the API method
+        for k in data.keys():
+            if k in kwargs:
+                kwargs.pop(k)
+
+        # Remove any 'id' passed in data or kwargs, as new instances mustn't have IDs yet
+        if "id" in kwargs:
+            kwargs.pop("id")
+
+        if "id" in data:
+            data.pop("id")
+
+        self._data = self.API_METHODS["create"](data=data, nomodel=True, **kwargs)
+
+    def refresh(self, **kwargs):
+        self._data = self.API_METHODS["read"](id=self.id, nomodel=True, **kwargs)
+
+    def update(self, data, **kwargs):
+        # Don't accept an id in kwargs here, is should be in _data
+        if "id" in kwargs:
+            kwargs.pop("id")
+
+        self._confirm_i_have_id("update")
+        self._data = self.API_METHODS["update"](
+            id=self.id, data=data, nomodel=True, **kwargs
+        )
+
+    def delete(self):
+        self._confirm_i_have_id("delete")
+        self.API_METHODS["delete"](self.id)
+        self._data = None
+        return self._data
+
+    def save(self, **kwargs):
+        if self.id:
+            self.update(self._data, **kwargs)
+        else:
+            self.create(self._data, **kwargs)
+
+    def load(self, data):
+        self._check_id(data)
+        self._data = data
+
+    def merge(self, data):
+        self._check_id(data)
+        self._data = always_merger.merge(self._data, data)
+
+    @property
+    def id(self):
+        return self._data.get(self.id_attr, None)
 
     @property
     def raw(self):
@@ -40,4 +177,7 @@ class ApeyeApiModel(dict):
 
     def to_json(self):
         """Returns self as JSON"""
-        return json.dumps(self)
+        return json.dumps(self._data)
+
+    def to_dict(self):
+        return self._data

@@ -3,54 +3,63 @@ hasmethods:
   methods:
     list:
       method:   GET
-      path:     /things/
-      return:   200
+      path:     /things
+      expect:   200
+      paginate: true
+      return:   list
     get:
       method:   GET
       path:     /things/:id
-      return:   [200, 201]
+      expect:   [200, 201]
+      return:   singleton
     create:
       method:   POST
       path:     /things
-      return:   204
+      expect:   201
     update:
       method:   PUT
       path:     /things/:id
-      return:   200
+      expect:   200
+      object_method: update
       default_tokens:
         otherthing: changedstuff
     delete:
       method:   DELETE
-      path:     /things/:lots/:of/:tokens/here
+      path:     /things/:lots/:of/:tokens/here/:id
       nobase:   true
+      expect:   204
       default_params:
         confirm: true
 container:
   subcontainer:
     model: mymodel
-    response_list_path: "mymodels"
-    response_single_path: "mymodel"
+    list_data_key: "mymodels"
+    singleton_data_key: "mymodel"
     methods:
       list:
         method: GET
         path: /stuff/whatnot
+        return: dict
       get:
         method: GET
         path: /stuff/whatnot/:id
-        singleton: true
+        return: singleton
         object_method: read
       create:
         method: POST
         path: /stuff/whatnot
         object_method: create
+        return: singleton
       update:
         method: PUT
         path: /stuff/whatnot/:id
         object_method: update
+        return: singleton
       delete:
-        method: PUT
+        method: DELETE
         path: /stuff/whatnot/:id
         object_method: delete
+        expect: 204
   subcontainer2:
     model: othermodel
     methods:
@@ -79,3 +88,8 @@ container:
       list:
         method: GET
         path: /nomodel/items
+errors:
+  methods:
+    badmethod:
+      method: FAKE
+      path: /doesnt/matter

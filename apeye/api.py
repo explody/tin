@@ -1,73 +1,17 @@
+import collections
 import re
 import requests
-import urllib
 import simplejson as json
+import urllib
 
 from apeye.auth import HTTPGenericHeaderAuth, HTTPGenericParameterAuth
+from apeye.base import ApeyeApiBase, ApeyeApiClass
 from apeye.config import ApeyeConfig
-from apeye.exceptions import ApeyeInvalidArgs, ApeyeError
+from apeye.exceptions import ApeyeInvalidArgs, ApeyeError, ApeyeObjectNotFound
 from apeye.models import ApeyeApiModel
 from apeye.response import ApeyeApiResponseFactory
 
-
-class ApeyeApiClass(object):
-    """Simple class for holding additional ApeyeApiClass's and ApeyeApiMethod's"""
-
-    def __init__(self, objpath=None):
-        self._methods = []
-        self._classes = {}
-        self._objpath = objpath
-
-    def __repr__(self):
-        """Represents self as a string"""
-        return type(self).__name__
-
-    def get_objpath(self):
-        return self._objpath
-
-    def set_path(self, objpath):
-        self._objpath = objpath
-
-    def add_method(self, name, method):
-        setattr(self, name, method)
-        self._methods.append(name)
-
-    def add_class(self, name, cls):
-        self._classes[name] = cls
-
-    def methods(self):
-        return [getattr(self, mth) for mth in self._methods]
-
-    def classes(self):
-        return [cls for cls in self._classes.values()]
-
-    def get_class(self, name):
-        return self._classes[name]
-
-    def _recurse(self, obj, strings=False):
-        """Recurses through defined classes and methods and builds a dict of their names"""
-        layer = {"classes": {}, "methods": []}
-        for mth in obj.methods():
-            layer["methods"].append(str(mth) if strings else mth)
-        for cls in obj.classes():
-            layer["classes"][str(cls)] = self._recurse(cls, strings)
-
-        if not layer["classes"]:
-            del layer["classes"]
-
-        if not layer["methods"]:
-            del layer["methods"]
-
-        return layer
-
-    def tree(self):
-        """Returns an informational dict of the object/method hierarchy, as name strings"""
-        return self._recurse(self)
-
-    def to_json(self):
-        """Returns the tree as JSON"""
-
-        return json.dumps(self._recurse(self, True))
+from deepmerge import always_merger
 
 
 class ApeyeApi(ApeyeApiClass):
@@ -85,9 +29,10 @@ class ApeyeApi(ApeyeApiClass):
     """
 
     def __init__(self, **kwargs):
-        super(ApeyeApi, self).__init__()
+        super().__init__()
 
         self.conf = ApeyeConfig(**kwargs)
+        self.obj_path = self.conf.api_name
 
         self._headers = self.conf.headers
         self._auth_obj = self._default_auth()
@@ -95,20 +40,32 @@ class ApeyeApi(ApeyeApiClass):
         self._session = requests.Session() if self.conf.use_session else None
 
         self.tokenre = re.compile(":([a-zA-Z0-9_-]+)")
-        self._recurse_build_method_path(self, self.conf.apidata)
 
-    def _recurse_build_method_path(self, obj, api_data):
+        self._recurse_build_method_path(self, self.conf.apidata, self.obj_path)
 
-        for cls, cls_data in api_data.items():
+    def _recurse_build_method_path(self, obj, api_data, obj_path=None):
 
-            new_type = type(cls, (ApeyeApiClass,), {})
+        if obj_path is None:
+            obj_path = self.conf.api_name
+
+        for cls_name, cls_data in api_data.items():
+
+            new_type = type(cls_name, (ApeyeApiClass,), {})
+            container_path = "{}.{}".format(obj_path, cls_name)
+            setattr(new_type, "_obj_path", container_path)
 
             if cls_data.get("model"):
+
                 model_data = self.conf.models.get(cls_data["model"], {})
                 model_type = type(cls_data["model"], (ApeyeApiModel,), model_data)
-                setattr(new_type, "model", model_type)
+                setattr(new_type, "_model", model_type)
+                setattr(
+                    model_type,
+                    "_obj_path",
+                    "{}.{}".format(container_path, cls_data["model"]),
+                )
 
-            for attr in ["response_list_path", "response_single_path"]:
+            for attr in ["list_data_key", "singleton_data_key"]:
                 if cls_data.get(attr):
                     setattr(
                         new_type,
@@ -118,29 +75,33 @@ class ApeyeApi(ApeyeApiClass):
 
             new_obj = new_type()
 
+            obj.add_class(cls_name, new_obj)
+
             if cls_data.get("methods"):
                 # If a child node has 'methods', it's an endpoint
 
                 # For each defined method, add an ApeyeApiMethod as
                 # an attribute in the current ApeyeApiClass instance
                 for mth, mth_data in cls_data["methods"].items():
+
                     new_method = ApeyeApiMethod(self, new_obj, mth, mth_data)
+                    new_method.obj_path = "{}.{}".format(container_path, mth)
+
                     new_obj.add_method(mth, new_method)
 
-                    # If there is an associated model, it will get the same methods
+                    # If there is an associated model, it will get ome of the same methods
                     # as the parent class
-                    if hasattr(new_type, "model"):
+                    if hasattr(new_type, "_model") and new_type._model is not None:
                         # Only add methods to the object model that are explicitly labeled as
-                        # object methods
+                        # object CRUD methods
                         if "object_method" in mth_data:
-                            setattr(new_type.model, mth, new_method)
+                            crud_method = mth_data["object_method"].lower()
+                            if crud_method in new_obj.model.API_METHODS:
+                                new_obj.model.API_METHODS[crud_method] = new_method
 
             else:
                 # If there are no methods, it's a container class
-                self._recurse_build_method_path(new_obj, cls_data)
-
-            setattr(obj, cls, new_obj)
-            obj.add_class(cls, getattr(obj, cls))
+                self._recurse_build_method_path(new_obj, cls_data, container_path)
 
     @property
     def request(self):
@@ -181,8 +142,8 @@ class ApeyeApi(ApeyeApiClass):
             return None
 
 
-class ApeyeApiMethod(object):
-    def __init__(self, apiobj, clsobj, name, method_data):
+class ApeyeApiMethod(ApeyeApiBase):
+    def __init__(self, apiobj, clsobj, name, method_data, obj_path=None):
         """
         The ApeyeApiMethod represents an endpoint method to call on a remote REST API.
 
@@ -216,13 +177,23 @@ class ApeyeApiMethod(object):
 
         # If the method specifies an expected return code, grab it, otherwise
         # default to 200
-        if "return" in self._method_data:
-            if isinstance(self._method_data["return"], list):
-                self.expect_return = [int(r) for r in self._method_data["return"]]
+        if "expect" in self._method_data:
+            if isinstance(self._method_data["expect"], list):
+                self.expect_return_codes = [int(r) for r in self._method_data["expect"]]
             else:
-                self.expect_return = [self._method_data["return"]]
+                self.expect_return_codes = [self._method_data["expect"]]
         else:
-            self.expect_return = [200]
+            self.expect_return_codes = [200]
+
+        if "return" in self._method_data:
+            self.expect_return_data = self._method_data["return"]
+        else:
+            self.expect_return_data = "dict"
+
+        if "paginate" in self._method_data:
+            self._paginate = self._method_data["paginate"]
+        else:
+            self._paginate = True
 
         self.default_params = (
             self.api.conf.default_params
@@ -250,6 +221,8 @@ class ApeyeApiMethod(object):
             self.path,
         )
 
+        super().__init__()
+
     def to_json(self):
 
         return json.dumps(
@@ -266,13 +239,6 @@ class ApeyeApiMethod(object):
     def path_tokens(self):
         return self.api.tokenre.findall(self.path)
 
-    def __repr__(self):
-
-        if self.cls.get_objpath():
-            return "%s" % (self.name)
-        else:
-            return "%s.%s.%s" % (self.api.conf.api_name, self.cls, self.name)
-
     def __call__(self, id=None, **kwargs):
 
         # This is where we can put validations on the kwargs,
@@ -283,6 +249,10 @@ class ApeyeApiMethod(object):
         params = self.default_params.copy()
         tokens = self.default_tokens.copy()
 
+        # if this is true, ApeyeApiResponseFactory will not instantiate model instances from
+        # response data, and just return JSON.  Default is False.
+        nomodel = kwargs.pop("nomodel") if "nomodel" in kwargs else False
+
         # Overwrite with provided arguments. Pop the value out of kwargs.
         if "params" in kwargs:
             params.update(kwargs.pop("params"))
@@ -292,6 +262,12 @@ class ApeyeApiMethod(object):
             data = kwargs.pop("data")
         else:
             data = None
+
+        # Support overriding default paginate behavior with a kwarg
+        if "paginate" in kwargs:
+            paginate = kwargs.pop("paginate")
+        else:
+            paginate = self._paginate
 
         # If 'id' is passed as a positional, it overrides 'id' as a kwarg
         if id is not None:
@@ -315,141 +291,109 @@ class ApeyeApiMethod(object):
 
         try:
             response_data = None
-            response_count = {}
+
             while True:
-                if self.method == "GET":
-                    response = self.api.request.get(
-                        url,
-                        headers=self.api.headers,
-                        auth=self.api.auth,
-                        verify=self.api.conf.ssl["verify"],
-                        params=urllib.parse.urlencode(
-                            params, quote_via=urllib.parse.quote
-                        ),
-                    )
-                elif self.method == "OPTIONS":
-                    response = self.api.request.options(
-                        url,
-                        headers=self.api.headers,
-                        auth=self.api.auth,
-                        verify=self.api.conf.ssl["verify"],
-                        params=urllib.parse.urlencode(
-                            params, quote_via=urllib.parse.quote
-                        ),
-                    )
-                elif self.method == "POST":
-                    response = self.api.request.post(
-                        url,
-                        data=json.dumps(data),
-                        headers=self.api.headers,
-                        auth=self.api.auth,
-                        verify=self.api.conf.ssl["verify"],
-                        params=urllib.parse.urlencode(
-                            params, quote_via=urllib.parse.quote
-                        ),
-                    )
-                elif self.method == "PATCH":
-                    response = self.api.request.patch(
-                        url,
-                        data=json.dumps(data),
-                        headers=self.api.headers,
-                        auth=self.api.auth,
-                        verify=self.api.conf.ssl["verify"],
-                        params=urllib.parse.urlencode(
-                            params, quote_via=urllib.parse.quote
-                        ),
-                    )
-                elif self.method == "PUT":
-                    response = self.api.request.put(
-                        url,
-                        data=json.dumps(data),
-                        headers=self.api.headers,
-                        auth=self.api.auth,
-                        verify=self.api.conf.ssl["verify"],
-                        params=urllib.parse.urlencode(
-                            params, quote_via=urllib.parse.quote
-                        ),
-                    )
-                elif self.method == "DELETE":
-                    response = self.api.request.delete(
-                        url,
-                        data=json.dumps(data),
-                        headers=self.api.headers,
-                        auth=self.api.auth,
-                        verify=self.api.conf.ssl["verify"],
-                        params=urllib.parse.urlencode(
-                            params, quote_via=urllib.parse.quote
-                        ),
-                    )
+
+                # Grab the requests method based on http method name
+                try:
+                    requests_method = getattr(self.api.request, self.method.lower())
+                except AttributeError:
+                    raise ApeyeError("Invalid HTTP method: {}".format(self.method))
+
+                # Common arguments with all methods
+                request_args = {
+                    "headers": self.api.headers,
+                    "auth": self.api.auth,
+                    "verify": self.api.conf.ssl["verify"],
+                    "params": urllib.parse.urlencode(
+                        params, quote_via=urllib.parse.quote
+                    ),
+                }
+
+                # Add data if we have any
+                if data:
+                    request_args["data"] = json.dumps(data)
+
+                # Call the requests method
+                response = requests_method(url, **request_args)
 
                 if response.status_code == 404:
                     raise ApeyeObjectNotFound(
-                        "Object not found. Tried: %s. "
-                        "Apeye says: %s" % (url, response.text)
+                        "Object not found. Tried: {}. "
+                        "Remote API says: {}".format(url, response.text)
                     )
-                elif response.status_code not in self.expect_return:
+                elif response.status_code not in self.expect_return_codes:
                     raise ApeyeError(
-                        "ERROR at %s Got return code %s, expected %s. Apeye says: %s"
-                        % (
+                        "ERROR at {} Got return code {}, expected {}. "
+                        "Remote API says: {}".format(
                             url,
                             response.status_code,
-                            ",".join([str(r) for r in self.expect_return]),
+                            ",".join([str(r) for r in self.expect_return_codes]),
                             response.text,
                         )
                     )
 
-                try:
-                    current_response_data = response.json()
-                except Exception as e:
-                    raise ApeyeError(
-                        "ERROR decoding response JSON. "
-                        "Raw response is: %s" % response.text
-                    )
-
-                if isinstance(response_data, list):
-                    response_data.extend(current_response_data)
-                elif isinstance(response_data, dict):
-                    response_data.update(current_response_data)
+                if response.status_code == 204:
+                    response_data = None
+                    break
                 else:
-                    response_data = current_response_data
+                    try:
+                        current_response_data = response.json()
+                    except Exception as e:
+                        raise ApeyeError(
+                            "ERROR decoding response JSON. "
+                            "Raw response is: {}".format(response.content)
+                        )
 
-                # Handle pagination types
-                # "header_count" expects a total passed over in the HTTP header
-                #
-                if (hasattr(self.api.conf, "pagination")) and (
-                    self.api.conf.pagination["type"] == "header_count"
-                ):
-                    header_count = response.headers.get(
-                        self.api.conf.pagination["header"], "0"
-                    )  # if the specified header doesn't exist, assume 0 addt'l pages
-
-                    response_count["current"] = len(current_response_data)
-                    response_count["total"] = len(response_data)
-
-                    # If we haven't fetched all the records, set the config'd
-                    # path or params then continue
-                    if response_count["total"] < int(header_count):
-
-                        v = self.api.conf.pagination["value"]
-
-                        if "param" in self.api.conf.pagination:
-                            p = self.api.conf.pagination["param"]
-                            params[p] = response_count[v]
-                        elif "path" in self.api.conf.pagination:
-                            n = self.api.conf.pagination["path"]
-                            path = n % response_count[v]
-                            url = "%s/%s" % (url, path)
+                    # If we're paginating, this recursively merges the current response with
+                    # preceding ones
+                    if response_data:
+                        response_data = always_merger.merge(
+                            response_data, current_response_data
+                        )
                     else:
-                        break
+                        response_data = current_response_data
 
-                else:
-                    if "next" not in response.links:
+                    if "next" not in response.links or not paginate:
                         break
                     else:
                         url = response.links["next"]["url"]
+
+                # This next bit appears to have been almost exclusively for Oomnitza and their
+                # weird header-based paginating.  I'll leave it here for reference if we find
+                # enough APIs that do something like this but otherwise I think this would be
+                # better in the code using Apeye.
+
+                # # Handle pagination types
+                # # "header_count" expects a total passed over in the HTTP header
+                # if (hasattr(self.api.conf, "pagination")) and (
+                #     self.api.conf.pagination["type"] == "header_count"
+                # ):
+                #     header_count = response.headers.get(
+                #         self.api.conf.pagination["header"], "0"
+                #     )  # if the specified header doesn't exist, assume 0 addt'l pages
+                #
+                #     response_count["current"] = len(current_response_data)
+                #     response_count["total"] = len(response_data)
+                #
+                #     # If we haven't fetched all the records, set the config'd
+                #     # path or params then continue
+                #     if response_count["total"] < int(header_count):
+                #
+                #         v = self.api.conf.pagination["value"]
+                #
+                #         if "param" in self.api.conf.pagination:
+                #             p = self.api.conf.pagination["param"]
+                #             params[p] = response_count[v]
+                #         elif "path" in self.api.conf.pagination:
+                #             n = self.api.conf.pagination["path"]
+                #             path = n % response_count[v]
+                #             url = "%s/%s" % (url, path)
+                #     else:
+                #         break
 
         except requests.exceptions.HTTPError as e:
             raise ApeyeError("ERROR: %s" % e)
 
         response_factory = ApeyeApiResponseFactory()
-        return response_factory(response_data, response, self)
+        return response_factory(response_data, response, self, nomodel)
