@@ -2,7 +2,7 @@ import os
 import pytest
 
 from apeye.config import ApeyeConfig
-from apeye.exceptions import *
+from apeye.exceptions import ApeyeError, ApeyeConfigNotFound
 
 
 def arg_config_yml():
@@ -28,6 +28,7 @@ def test_arg_config_yml():
 
 def test_config_with_env():
     assert type(env_config()) is ApeyeConfig
+
 
 def test_arg_config_json():
     assert type(arg_config_json()) is ApeyeConfig
@@ -67,10 +68,14 @@ def test_no_models():
 class TestConfig:
     def test_config_files(self, config):
 
-        assert config.config_file in [os.path.abspath("test/data/api/testservice.yml"),
-                                      os.path.abspath("test/data/api/testservice.json")]
+        assert config.config_file in [
+            os.path.abspath("test/data/api/testservice.yml"),
+            os.path.abspath("test/data/api/testservice.json"),
+        ]
         assert config.apifile == os.path.abspath("test/data/api/testservice-api.yml")
-        assert config.modelfile == os.path.abspath("test/data/api/testservice-models.yml")
+        assert config.modelfile == os.path.abspath(
+            "test/data/api/testservice-models.yml"
+        )
 
     def test_config_dir(self, config):
         assert config.config_dir == os.path.dirname(
@@ -78,24 +83,27 @@ class TestConfig:
         )
 
     def test_credentials(self, config):
-        assert config.credentials == {'username': 'fakeuser', 'password': 'fakepassword'}
+        assert config.credentials == {
+            "username": "fakeuser",
+            "password": "fakepassword",
+        }
 
     def test_apiname(self, config):
-        assert config.api_name == 'testservice'
+        assert config.api_name == "testservice"
 
     def test_environment_values(self, config):
         print(config.config_file)
-        assert config.host == 'api.example.com'
-        assert config.scheme == 'https'
-        assert config.port == 443
-        assert config.authtype == 'basic'
-        assert config.type == 'application/json'
-        assert config.basepath == '/api'
-        assert config.ssl['verify'] is True
+        assert config.host == "localhost"
+        assert config.scheme == "http"
+        assert config.port == 5000
+        assert config.authtype == "basic"
+        assert config.type == "application/json"
+        assert config.basepath == "/api"
+        assert config.ssl["verify"] is True
 
     def test_get(self, config):
-        assert config.get('host') == 'api.example.com'
-        assert config.get('doesntexist') is None
+        assert config.get("host") == "localhost"
+        assert config.get("doesntexist") is None
 
     # def test_environments(self, config):
     #     assert config.environments == ['basic', 'param', 'header']

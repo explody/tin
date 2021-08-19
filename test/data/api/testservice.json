@@ -1,9 +1,9 @@
 {
   "environments": {
     "basic": {
-      "host": "api.example.com",
-      "scheme": "https",
-      "port": 443,
+      "host": "localhost",
+      "scheme": "http",
+      "port": 5000,
       "credfile": "credfile.yml",
       "authtype": "basic",
       "ssl": {
@@ -13,9 +13,9 @@
       "modelfile": "testservice-models.yml"
     },
     "param": {
-      "host": "api.example.com",
-      "scheme": "https",
-      "port": 443,
+      "host": "localhost",
+      "scheme": "http",
+      "port": 5000,
       "credfile": "credfile.yml",
       "authtype": "basic",
       "ssl": {
@@ -25,9 +25,9 @@
       "modelfile": "testservice-models.yml"
     },
     "header": {
-      "host": "api.example.com",
-      "scheme": "https",
-      "port": 443,
+      "host": "localhost",
+      "scheme": "http",
+      "port": 5000,
       "credfile": "credfile.yml",
       "authtype": "basic",
       "ssl": {
@@ -37,9 +37,9 @@
       "modelfile": "testservice-models.yml"
     },
     "no_models": {
-      "host": "api.example.com",
-      "scheme": "https",
-      "port": 443,
+      "host": "localhost",
+      "scheme": "http",
+      "port": 5000,
       "credfile": "credfile.yml",
       "authtype": "basic",
       "ssl": {

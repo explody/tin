@@ -1,12 +1,7 @@
-category:
-  attrs:
+mymodel:
+  id_attr: id
+  read:
     - id
-    - name
-    - dscription
-    - position
-    - default_category
-    - created_at
-    - updated_at
   must:
     - name
   may:

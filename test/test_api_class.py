@@ -19,12 +19,16 @@ def test_use_session_by_default():
 
 
 def test_use_session_explicit():
-    myapi = ApeyeApi(config_file="test/data/api/testservice.yml", environment="use_session")
+    myapi = ApeyeApi(
+        config_file="test/data/api/testservice.yml", environment="use_session"
+    )
     assert type(myapi.request) is requests.Session
 
 
 def test_no_session():
-    myapi = ApeyeApi(config_file="test/data/api/testservice.yml", environment="no_session")
+    myapi = ApeyeApi(
+        config_file="test/data/api/testservice.yml", environment="no_session"
+    )
     assert myapi.request is requests
 
 
@@ -34,7 +38,9 @@ def test_common_headers():
 
 
 def test_no_headers():
-    myapi = ApeyeApi(config_file="test/data/api/testservice.yml", environment="no_headers")
+    myapi = ApeyeApi(
+        config_file="test/data/api/testservice.yml", environment="no_headers"
+    )
     assert myapi.headers == {}
 
 
@@ -63,6 +69,7 @@ def test_header_auth():
 def test_param_auth():
     myapi = ApeyeApi(config_file="test/data/api/testservice.yml", environment="param")
     assert type(myapi.auth) is HTTPGenericParameterAuth
+
 
 def test_set_auth():
     myapi = ApeyeApi(config_file="test/data/api/testservice.yml", environment="no_auth")

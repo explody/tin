@@ -1,8 +1,8 @@
 environments:
   basic:
-    host: api.example.com
-    scheme: https
-    port: 443
+    host: localhost
+    scheme: http
+    port: 5000
     credfile: credfile.yml
     authtype: basic
     ssl:
@@ -10,9 +10,9 @@ environments:
     apifile: testservice-api.yml
     modelfile: testservice-models.yml
   param:
-    host: api.example.com
-    scheme: https
-    port: 443
+    host: localhost
+    scheme: http
+    port: 5000
     credfile: credfile.yml
     authtype: param
     ssl:
@@ -20,9 +20,9 @@ environments:
     apifile: testservice-api.yml
     modelfile: testservice-models.yml
   header:
-    host: api.example.com
-    scheme: https
-    port: 443
+    host: localhost
+    scheme: http
+    port: 5000
     credfile: credfile.yml
     authtype: header
     ssl:
@@ -30,9 +30,9 @@ environments:
     apifile: testservice-api.yml
     modelfile: testservice-models.yml
   no_auth:
-    host: api.example.com
-    scheme: https
-    port: 443
+    host: localhost
+    scheme: http
+    port: 5000
     credfile: credfile.yml
     authtype: none
     ssl:
@@ -40,18 +40,18 @@ environments:
     apifile: testservice-api.yml
     modelfile: testservice-models.yml
   no_models:
-    host: api.example.com
-    scheme: https
-    port: 443
+    host: localhost
+    scheme: http
+    port: 5000
     credfile: credfile.yml
     authtype: basic
     ssl:
       verify: true
     apifile: testservice-api.yml
   use_session:
-    host: api.example.com
-    scheme: https
-    port: 443
+    host: localhost
+    scheme: http
+    port: 5000
     credfile: credfile.yml
     authtype: basic
     use_session: true
@@ -60,9 +60,9 @@ environments:
     apifile: testservice-api.yml
     modelfile: testservice-models.yml
   no_session:
-    host: api.example.com
-    scheme: https
-    port: 443
+    host: localhost
+    scheme: http
+    port: 5000
     credfile: credfile.yml
     authtype: basic
     use_session: false
@@ -71,9 +71,9 @@ environments:
     apifile: testservice-api.yml
     modelfile: testservice-models.yml
   no_headers:
-    host: api.example.com
-    scheme: https
-    port: 443
+    host: localhost
+    scheme: http
+    port: 5000
     credfile: credfile.yml
     authtype: basic
     use_session: false

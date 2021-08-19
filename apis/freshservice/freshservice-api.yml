@@ -19,8 +19,8 @@ assets:
 solutions:
   categories:
     model: category
-    response_list_path: "categories"
-    response_single_path: "category"
+    list_data_key: "categories"
+    singleton_data_key: "category"
     methods:
       list:
         method: GET
