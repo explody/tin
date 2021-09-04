@@ -23,7 +23,7 @@ test:
     - echo $PWD
     - ls -l
     - pip install -r requirements.txt
-    - pip install pytest yamllint setuptools
+    - pip install pytest yamllint setuptools pytest_httpserver
     - python -m pytest
     - python -m yamllint apis/
 
