@@ -31,6 +31,7 @@ release:
   image: node:current-alpine
   stage: release
   script:
+    - apk --update add git
     - npm install semantic-release @semantic-release/gitlab @semantic-release/changelog conventional-changelog-eslint
     - npx semantic-release
   only:
