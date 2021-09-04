@@ -17,6 +17,8 @@ class ApeyeApiModel(ApeyeApiBase):
         self._response_data = {}
         self._response = None
         self._data = data
+        if 'id_attr' in data:
+            self.id_attr = data['id_attr']
 
         # These aren't really immutables, just their existence is, for __setattr__
         self._immutables = dir(self)
@@ -58,8 +60,15 @@ class ApeyeApiModel(ApeyeApiBase):
                     "Required attribute {} not present".format(required_attr)
                 )
 
+    def clean(self, data):
+        clean_data = dict(data)
+        if hasattr(self, 'read'):
+            for ro_attr in self.read:
+                clean_data.pop(ro_attr)
+        return clean_data
+
     def _confirm_i_have_id(self, action):
-        if not self.id:
+        if self.id is None:
             raise ApeyeError(
                 "Attempt to call {}() on an instance that isn't "
                 "saved yet".format(action)
@@ -116,9 +125,9 @@ class ApeyeApiModel(ApeyeApiBase):
 
     def save(self, **kwargs):
         if self.id:
-            self.update(self._data, **kwargs)
+            self.update(self.clean(self._data), **kwargs)
         else:
-            self.create(self._data, **kwargs)
+            self.create(self.clean(self._data), **kwargs)
 
     def load(self, data):
         self._check_id(data)

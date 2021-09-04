@@ -1,8 +1,37 @@
+agent:
+  id_attr: id
+  read:
+    - id
+  must:
+    - first_name
+    - email
+    - role_ids
+    - roles
+  may:
+    - last_name
+    - occasional
+    - job_title
+    - work_phone_number
+    - mobile_phone_number
+    - department_ids
+    - can_see_all_tickets_from_associated_departments
+    - reporting_manager_id
+    - address
+    - time_zone
+    - time_format
+    - language
+    - location_id
+    - background_information
+    - scoreboard_level_id
+    - group_ids
+    - member_of
+    - signature
+    - custom_fields
 category:
   attrs:
     - id
     - name
-    - dscription
+    - description
     - position
     - default_category
     - created_at
@@ -11,3 +40,32 @@ category:
     - name
   may:
     - description
+requester:
+  id_attr: id
+  read:
+    - id
+    - has_logged_in
+    - created_at
+    - updated_at
+    - is_agent
+    - department_ids
+    - secondary_emails
+  must:
+    - primary_email
+    - first_name
+    - last_name
+    - time_zone
+    - language
+  may:
+    - job_title
+    - secondary_emails
+    - work_phone_number
+    - mobile_phone_number
+    - department_ids
+    - can_see_all_tickets_from_associated_departments
+    - reporting_manager_id
+    - address
+    - time_format
+    - location_id
+    - background_information
+    - custom_fields
