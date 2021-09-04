@@ -1,0 +1,55 @@
+{
+   "branches" : [
+      "release"
+   ],
+   "plugins" : [
+      [
+         "@semantic-release/release-notes-generator",
+         {
+            "preset" : "eslint"
+         }
+      ],
+      [
+         "@semantic-release/commit-analyzer",
+         {
+            "preset" : "eslint",
+            "releaseRules" : [
+               {
+                  "release" : "major",
+                  "tag" : "Release"
+               },
+               {
+                  "release" : "major",
+                  "tag" : "Breaking"
+               },
+               {
+                  "release" : "patch",
+                  "tag" : "Docs"
+               },
+               {
+                  "release" : "patch",
+                  "tag" : "Fix"
+               },
+               {
+                  "release" : "minor",
+                  "tag" : "New"
+               },
+               {
+                  "release" : "minor",
+                  "tag" : "Update"
+               }
+            ]
+         }
+      ],
+      [
+         "@semantic-release/gitlab",
+         {
+            "assets" : [
+               "dist/**",
+            ],
+            "gitlabApiPathPrefix" : "/api/v4",
+            "gitlabUrl" : "https://gitlab.com"
+         }
+      ]
+   ]
+}
