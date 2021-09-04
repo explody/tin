@@ -1,4 +1,3 @@
-image: python:latest
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -8,18 +7,31 @@ cache:
     - .cache/pip
     - venv/
 
-before_script:
-  - python -V
-  - pip install virtualenv
-  - virtualenv venv
-  - source venv/bin/activate
-  - pip install -r requirements.txt
+stages:
+  - test
+  - release
+  - pages
 
 test:
+  image: python:latest
+  before_script:
+    - python -V
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
   script:
     - pip install pytest yamllint setuptools
     - python -m pytest
     - python -m yamllint apis/
+
+release:
+  image: os33/semantic-release:17.3.1
+  stage: release
+  script:
+    - semantic-release
+  only:
+    - release
 
 pages:
   script:
