@@ -32,7 +32,7 @@ release:
   stage: release
   script:
     - npm install semantic-release @semantic-release/gitlab @semantic-release/changelog conventional-changelog-eslint
-    - semantic-release
+    - npx semantic-release
   only:
     - release
 
