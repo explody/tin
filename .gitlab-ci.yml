@@ -28,11 +28,10 @@ test:
     - release
 
 release:
-  image: os33/semantic-release:17.3.1
+  image: node:current-alpine
   stage: release
   script:
-    - echo $PWD
-    - npm install conventional-changelog-eslint
+    - npm install semantic-release @semantic-release/gitlab @semantic-release/changelog conventional-changelog-eslint
     - semantic-release
   only:
     - release
