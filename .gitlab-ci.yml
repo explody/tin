@@ -26,6 +26,8 @@ test:
     - pip install pytest yamllint setuptools pytest_httpserver
     - python -m pytest
     - python -m yamllint apis/
+  except:
+    - release
 
 release:
   image: os33/semantic-release:17.3.1
