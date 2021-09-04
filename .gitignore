@@ -7,7 +7,6 @@ oneoffs
 
 /*.py
 /*.csv
-/*.txt
 !/setup.py
 
 production.yml
