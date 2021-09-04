@@ -20,6 +20,8 @@ test:
     - virtualenv venv
     - source venv/bin/activate
   script:
+    - echo $PWD
+    - ls -l
     - pip install -r requirements.txt
     - pip install pytest yamllint setuptools
     - python -m pytest
@@ -35,7 +37,7 @@ release:
 
 pages:
   script:
-    - pip install sphinx sphinx-rtd-theme
+    - pip install sphinx sphinx-rtd-theme sphinxcontrib-napoleon
     - cd doc ; make html
     - mv _build/html/ ../public/
   artifacts:
