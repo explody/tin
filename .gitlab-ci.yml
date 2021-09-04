@@ -1,3 +1,4 @@
+image: python:latest
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -13,14 +14,13 @@ stages:
   - pages
 
 test:
-  image: python:latest
   before_script:
     - python -V
     - pip install virtualenv
     - virtualenv venv
     - source venv/bin/activate
-    - pip install -r requirements.txt
   script:
+    - pip install -r requirements.txt
     - pip install pytest yamllint setuptools
     - python -m pytest
     - python -m yamllint apis/
