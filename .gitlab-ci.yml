@@ -33,6 +33,7 @@ release:
   image: os33/semantic-release:17.3.1
   stage: release
   script:
+    - npm install conventional-changelog-eslint
     - semantic-release
   only:
     - release
