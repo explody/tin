@@ -20,8 +20,6 @@ test:
     - virtualenv venv
     - source venv/bin/activate
   script:
-    - echo $PWD
-    - ls -l
     - pip install -r requirements.txt
     - pip install pytest yamllint setuptools pytest_httpserver
     - python -m pytest
@@ -33,6 +31,7 @@ release:
   image: os33/semantic-release:17.3.1
   stage: release
   script:
+    - echo $PWD
     - npm install conventional-changelog-eslint
     - semantic-release
   only:
