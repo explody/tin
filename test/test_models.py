@@ -204,7 +204,6 @@ def test_existing_model_save(httpserver: HTTPServer):
         "/api/stuff/whatnot/1",
         method="PUT",
         json={
-            "id": 1,
             "name": "updated name",
             "description": "updated description",
         },

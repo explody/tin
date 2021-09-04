@@ -1,3 +1,4 @@
+---
 environments:
   production:
     host: yourhost.freshservice.com
@@ -6,15 +7,12 @@ environments:
     credfile: ~/.apeye/apis/freshservice/production.yml
     authtype: basic
     ssl:
-        verify: true
+      verify: true
     apifile: freshservice-api.yml
     modelfile: freshservice-models.yml
-
-
-# Common settings apply to all environments
 common:
+  # Common settings apply to all environments
   type: "application/json"
   basepath: "/api/v2"
   params:
-    may: ["links","filter_by","filter_value"]
-
+    may: ["links", "filter_by", "filter_value"]

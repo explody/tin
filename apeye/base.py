@@ -62,7 +62,8 @@ class ApeyeApiClass(ApeyeApiBase):
         return self._classes[name]
 
     def _recurse(self, obj, toplevel=True, strings=False):
-        """Recurses through defined classes and methods and builds a dict of their names"""
+        """Recurses through defined classes and methods and
+           builds a dict of their names"""
         layer = {"classes": {}, "methods": [], "model": None}
 
         for mth in obj.methods():
@@ -81,7 +82,8 @@ class ApeyeApiClass(ApeyeApiBase):
         return layer
 
     def tree(self, strings=False):
-        """Returns an informational dict of the object/method hierarchy, as name strings"""
+        """Returns an informational dict of the object/method hierarchy,
+           as name strings"""
         return self._recurse(self, True, strings)
 
     def to_json(self):

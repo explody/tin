@@ -64,7 +64,7 @@ class ApeyeApiModel(ApeyeApiBase):
         clean_data = dict(data)
         if hasattr(self, "read"):
             for ro_attr in self.read:
-                clean_data.pop(ro_attr)
+                clean_data.pop(ro_attr, None)
         return clean_data
 
     def _confirm_i_have_id(self, action):
@@ -95,7 +95,8 @@ class ApeyeApiModel(ApeyeApiBase):
             if k in kwargs:
                 kwargs.pop(k)
 
-        # Remove any 'id' passed in data or kwargs, as new instances mustn't have IDs yet
+        # Remove any 'id' passed in data or kwargs, as new instances mustn't
+        # have IDs yet
         if "id" in kwargs:
             kwargs.pop("id")
 
