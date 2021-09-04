@@ -22,8 +22,12 @@ test:
   script:
     - pip install -r requirements.txt
     - pip install pytest yamllint setuptools pytest_httpserver
-    - python -m pytest
+    - python -m pytest --junitxml=report.xml
     - python -m yamllint apis/
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
   except:
     - release
 
