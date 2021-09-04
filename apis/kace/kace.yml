@@ -1,6 +1,6 @@
 environments:
   production:
-    host: kbox.vant.com
+    host: yourhost.com
     scheme: https
     port: 443
     credfile: ~/.apeye/apis/kace/production.yml

@@ -17,8 +17,8 @@ class ApeyeApiModel(ApeyeApiBase):
         self._response_data = {}
         self._response = None
         self._data = data
-        if 'id_attr' in data:
-            self.id_attr = data['id_attr']
+        if "id_attr" in data:
+            self.id_attr = data["id_attr"]
 
         # These aren't really immutables, just their existence is, for __setattr__
         self._immutables = dir(self)
@@ -62,7 +62,7 @@ class ApeyeApiModel(ApeyeApiBase):
 
     def clean(self, data):
         clean_data = dict(data)
-        if hasattr(self, 'read'):
+        if hasattr(self, "read"):
             for ro_attr in self.read:
                 clean_data.pop(ro_attr)
         return clean_data

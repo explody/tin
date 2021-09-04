@@ -13,3 +13,9 @@ oneoffs
 production.yml
 development.yml
 vagrant.yml
+
+.coverage
+htmlcov
+
+apeye.egg-info
+doc/_build
