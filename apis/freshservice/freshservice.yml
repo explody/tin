@@ -1,6 +1,6 @@
 environments:
   production:
-    host: roivant.freshservice.com
+    host: yourhost.freshservice.com
     scheme: https
     port: 443
     credfile: ~/.apeye/apis/freshservice/production.yml
