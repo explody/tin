@@ -1,4 +1,3 @@
-import collections
 import re
 import requests
 import simplejson as json
@@ -24,7 +23,8 @@ class ApeyeApi(ApeyeApiClass):
         **kwargs: Arbitrary keyword arguments which will be passed to ApeyeConfig
 
     Attributes:
-        conf (ApeyeConfig): An ApeyeConfig object representing the configuration for this API
+        conf (ApeyeConfig): An ApeyeConfig object representing the configuration for
+            this API
         tokenre (sre): Compiled regex for locating tokens in the url path string
     """
 
@@ -89,11 +89,11 @@ class ApeyeApi(ApeyeApiClass):
 
                     new_obj.add_method(mth, new_method)
 
-                    # If there is an associated model, it will get ome of the same methods
-                    # as the parent class
+                    # If there is an associated model, it will get ome of the same
+                    # methods as the parent class
                     if hasattr(new_type, "_model") and new_type._model is not None:
-                        # Only add methods to the object model that are explicitly labeled as
-                        # object CRUD methods
+                        # Only add methods to the object model that are explicitly
+                        # labeled as object CRUD methods
                         if "object_method" in mth_data:
                             crud_method = mth_data["object_method"].lower()
                             if crud_method in new_obj.model.API_METHODS:
@@ -148,11 +148,12 @@ class ApeyeApiMethod(ApeyeApiBase):
         The ApeyeApiMethod represents an endpoint method to call on a remote REST API.
 
         Args:
-            apiobj (ApeyeApi): The parent object that contains all classes and methods of this API
+            apiobj (ApeyeApi): The parent object that contains all classes and methods
+                of this API
             clsobj (ApeyeApiClass): The parent object of this method
             name (str): The name of this method
-            method_data (dict): A set of information about this method as defined in the config YAML
-                or Swagger JSON
+            method_data (dict): A set of information about this method as defined in
+                the config YAML
 
         Attributes:
             name (str): The method name
@@ -249,8 +250,8 @@ class ApeyeApiMethod(ApeyeApiBase):
         params = self.default_params.copy()
         tokens = self.default_tokens.copy()
 
-        # if this is true, ApeyeApiResponseFactory will not instantiate model instances from
-        # response data, and just return JSON.  Default is False.
+        # if this is true, ApeyeApiResponseFactory will not instantiate model instances
+        # from response data, and just return JSON.  Default is False.
         nomodel = kwargs.pop("nomodel") if "nomodel" in kwargs else False
 
         # Overwrite with provided arguments. Pop the value out of kwargs.
@@ -339,14 +340,15 @@ class ApeyeApiMethod(ApeyeApiBase):
                 else:
                     try:
                         current_response_data = response.json()
-                    except Exception as e:
+                    except Exception:
+                        # FIXME: excessively generic exception
                         raise ApeyeError(
                             "ERROR decoding response JSON. "
                             "Raw response is: {}".format(response.content)
                         )
 
-                    # If we're paginating, this recursively merges the current response with
-                    # preceding ones
+                    # If we're paginating, this recursively merges the current response
+                    # with preceding ones
                     if response_data:
                         response_data = always_merger.merge(
                             response_data, current_response_data
@@ -359,10 +361,10 @@ class ApeyeApiMethod(ApeyeApiBase):
                     else:
                         url = response.links["next"]["url"]
 
-                # This next bit appears to have been almost exclusively for Oomnitza and their
-                # weird header-based paginating.  I'll leave it here for reference if we find
-                # enough APIs that do something like this but otherwise I think this would be
-                # better in the code using Apeye.
+                # This next bit appears to have been almost exclusively for Oomnitza and
+                # their weird header-based paginating.  I'll leave it here for reference
+                # if we find enough APIs that do something like this but otherwise I
+                # think this would be better in the code using Apeye.
 
                 # # Handle pagination types
                 # # "header_count" expects a total passed over in the HTTP header

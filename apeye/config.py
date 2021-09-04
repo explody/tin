@@ -1,7 +1,6 @@
 import logging
 import os
 import simplejson as json
-import sys
 import yaml
 
 from apeye.exceptions import ApeyeConfigNotFound, ApeyeError
@@ -18,16 +17,17 @@ logger = logging.getLogger(__name__)
 class ApeyeConfig(object):
     """Class which represents the configuration of the API
 
-    Configuration will be loaded from a YAML or JSON file, which may have different environments
-    defined, each with their own settings.  Upon parsing, the config key->values will be stored
-    as object attributes.
+    Configuration will be loaded from a YAML or JSON file, which may have different
+    environments defined, each with their own settings.  Upon parsing, the config
+    key->values will be stored as object attributes.
 
     Args:
         config_file (str): Relative or absolute path to the YAML or JSON config file
         environment (str): Name of the environment to load
 
     Attributes:
-        confpaths (list): List of strings of paths in which to find the config_file. Defined above.
+        confpaths (list): List of strings of paths in which to find the config_file.
+            Defined above.
         confpath (str): Final file path of the config file
     """
 
@@ -135,12 +135,12 @@ class ApeyeConfig(object):
         """
         try:
             return getattr(self, key)
-        except AttributeError as e:
+        except AttributeError:
             return None
 
     def find_config(self, filename):
-        """Takes the given path to a config file, ensures it exists, and returns an absolute
-        path.
+        """Takes the given path to a config file, ensures it exists, and returns an
+            absolute path.
 
         Arguments:
             filename (str): The absolute or relative path to the file"

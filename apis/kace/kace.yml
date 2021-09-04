@@ -1,3 +1,4 @@
+---
 environments:
   production:
     host: yourhost.com
@@ -7,13 +8,11 @@ environments:
     authtype: none
     use_session: true
     ssl:
-        verify: true
+      verify: true
     apifile: kace-api.yml
-
-
-# Common settings apply to all environments
 common:
+  # Common settings apply to all environments
   type: "application/json"
   basepath: "/api"
   params:
-    may: ["links","filter_by","filter_value"]
+    may: ["links", "filter_by", "filter_value"]
