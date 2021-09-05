@@ -1,4 +1,4 @@
-"""Apeye is a thin, configurable wrapper around requests, to interact with
+"""Tin is a thin, configurable wrapper around requests, to interact with
 REST APIs that speak JSON.
 """
 

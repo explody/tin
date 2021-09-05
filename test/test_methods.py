@@ -2,12 +2,12 @@ import json
 import pytest
 import requests
 
-from apeye.api import ApeyeApi, ApeyeApiMethod
-from apeye.base import ApeyeApiClass
-from apeye.exceptions import ApeyeObjectNotFound, ApeyeError, ApeyeInvalidArgs
-from apeye.models import ApeyeApiModel
-from apeye.response import (
-    ApeyeApiResponseNoContent,
+from tin.api import TinApi, TinApiMethod
+from tin.base import TinApiClass
+from tin.exceptions import TinObjectNotFound, TinError, TinInvalidArgs
+from tin.models import TinApiModel
+from tin.response import (
+    TinApiResponseNoContent,
 )
 from pytest_httpserver import HTTPServer
 from types import ModuleType
@@ -15,7 +15,7 @@ from types import ModuleType
 
 def api_inst(env="basic", config="test/data/api/testservice.yml"):
     # Just a shortcut to keep the repeating text down
-    return ApeyeApi(config_file=config, environment=env)
+    return TinApi(config_file=config, environment=env)
 
 
 @pytest.fixture(scope="session")
@@ -58,14 +58,14 @@ def test_available_environments(env):
             if k == "classes":
                 # We know the data under 'classes' is a dict, and the keys are objects
                 for vkey in v.keys():
-                    assert type(vkey) is ApeyeApiClass
+                    assert type(vkey) is TinApiClass
             elif k == "methods":
                 # We know the value under 'methods' is a list of objects
                 for mth in v:
-                    assert type(mth) is ApeyeApiMethod
+                    assert type(mth) is TinApiMethod
             elif k == "model":
                 # We know 'model' is a single model class
-                assert type(v) is ApeyeApiModel
+                assert type(v) is TinApiModel
 
     recurse_tree(testservice.tree(False))
 
@@ -76,7 +76,7 @@ def test_available_environments(env):
 )
 def test_named_methods(env):
     testservice = api_inst(env)
-    assert type(testservice.hasmethods.update) is ApeyeApiMethod
+    assert type(testservice.hasmethods.update) is TinApiMethod
 
 
 def test_to_json():
@@ -118,7 +118,7 @@ def test_no_session():
 
 def test_missing_token():
     testservice = api_inst()
-    with pytest.raises(ApeyeInvalidArgs):
+    with pytest.raises(TinInvalidArgs):
         testservice.hasmethods.delete(1, **{"lots": "one", "of": "two"})
 
 
@@ -195,7 +195,7 @@ def test_delete(httpserver: HTTPServer):
         1, **{"lots": "one", "of": "two", "tokens": "three"}
     )
 
-    assert type(response) == ApeyeApiResponseNoContent
+    assert type(response) == TinApiResponseNoContent
 
 
 def test_404(httpserver: HTTPServer):
@@ -203,7 +203,7 @@ def test_404(httpserver: HTTPServer):
         "Not Found", status=404
     )
     testservice = api_inst()
-    with pytest.raises(ApeyeObjectNotFound):
+    with pytest.raises(TinObjectNotFound):
         testservice.hasmethods.get(1)
 
 
@@ -212,7 +212,7 @@ def test_unexpected(httpserver: HTTPServer):
         "Not Found", status=204
     )
     testservice = api_inst()
-    with pytest.raises(ApeyeError):
+    with pytest.raises(TinError):
         testservice.hasmethods.get(1)
 
 
@@ -221,13 +221,13 @@ def test_bad_json(httpserver: HTTPServer):
         "this is not JSON", status=200
     )
     testservice = api_inst()
-    with pytest.raises(ApeyeError):
+    with pytest.raises(TinError):
         testservice.hasmethods.get(1)
 
 
 def test_bad_method():
     testservice = api_inst()
-    with pytest.raises(ApeyeError):
+    with pytest.raises(TinError):
         testservice.errors.badmethod()
 
 

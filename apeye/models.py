@@ -1,10 +1,10 @@
-from apeye.base import ApeyeApiBase
-from apeye.exceptions import ApeyeModelError, ApeyeError
+from tin.base import TinApiBase
+from tin.exceptions import TinModelError, TinError
 from deepmerge import always_merger
 import simplejson as json
 
 
-class ApeyeApiModel(ApeyeApiBase):
+class TinApiModel(TinApiBase):
 
     API_METHODS = {"create": None, "read": None, "update": None, "delete": None}
 
@@ -12,7 +12,7 @@ class ApeyeApiModel(ApeyeApiBase):
     _initialized = False
 
     def __init__(self, data={}):
-        ApeyeApiBase.__init__(self)
+        TinApiBase.__init__(self)
 
         self._response_data = {}
         self._response = None
@@ -56,7 +56,7 @@ class ApeyeApiModel(ApeyeApiBase):
     def validate(self, data):
         for required_attr in self.must:
             if required_attr not in data:
-                raise ApeyeModelError(
+                raise TinModelError(
                     "Required attribute {} not present".format(required_attr)
                 )
 
@@ -69,7 +69,7 @@ class ApeyeApiModel(ApeyeApiBase):
 
     def _confirm_i_have_id(self, action):
         if self.id is None:
-            raise ApeyeError(
+            raise TinError(
                 "Attempt to call {}() on an instance that isn't "
                 "saved yet".format(action)
             )
@@ -77,7 +77,7 @@ class ApeyeApiModel(ApeyeApiBase):
     def _check_id(self, data):
         if self.id_attr in data:
             if self.id != data[self.id_attr]:
-                raise ApeyeError(
+                raise TinError(
                     "Given data has a different ID value ({}) than mine ({}), "
                     "cannot load or merge".format(data[self.id_attr], self.id)
                 )
@@ -85,7 +85,7 @@ class ApeyeApiModel(ApeyeApiBase):
     def create(self, data, **kwargs):
 
         if not isinstance(data, dict):
-            raise ApeyeError("Model data must be a dict")
+            raise TinError("Model data must be a dict")
 
         self.validate(data)
 

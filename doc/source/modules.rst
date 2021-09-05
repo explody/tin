@@ -1,7 +1,7 @@
-apeye
+tin
 =====
 
 .. toctree::
    :maxdepth: 4
 
-   apeye
+   tin

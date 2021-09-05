@@ -3,7 +3,7 @@ import os
 import simplejson as json
 import yaml
 
-from apeye.exceptions import ApeyeConfigNotFound, ApeyeError
+from tin.exceptions import TinConfigNotFound, TinError
 
 DEFAULTS = {"scheme": "https", "port": 443}
 
@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class ApeyeConfig(object):
+class TinConfig(object):
     """Class which represents the configuration of the API
 
     Configuration will be loaded from a YAML or JSON file, which may have different
@@ -34,16 +34,16 @@ class ApeyeConfig(object):
     def __init__(self, config_file=None, environment=None):
 
         if config_file is None:
-            if "APEYE_CONFIG" in os.environ:
-                config_file = os.environ.get("APEYE_CONFIG")
+            if "TIN_CONFIG" in os.environ:
+                config_file = os.environ.get("TIN_CONFIG")
             else:
-                raise ApeyeError("Config file cannot be None")
+                raise TinError("Config file cannot be None")
 
         if environment is None:
-            if "APEYE_ENV" in os.environ:
-                environment = os.environ.get("APEYE_ENV")
+            if "TIN_ENV" in os.environ:
+                environment = os.environ.get("TIN_ENV")
             else:
-                raise ApeyeError("Environment cannot be None")
+                raise TinError("Environment cannot be None")
 
         self.config_file = self.find_config(config_file)
         self.config_dir = os.path.dirname(self.config_file)
@@ -55,10 +55,10 @@ class ApeyeConfig(object):
         conf = self._loadfile(self.config_file)
 
         if conf is None:
-            raise ApeyeError("Invalid config (empty?)")
+            raise TinError("Invalid config (empty?)")
 
         if environment not in conf.get("environments", {}):
-            raise ApeyeError(
+            raise TinError(
                 "No such environment is configured: {}".format(environment)
             )
 
@@ -160,4 +160,4 @@ class ApeyeConfig(object):
             if os.path.isfile(filename):
                 return os.path.abspath(filename)
 
-        raise ApeyeConfigNotFound(filename)
+        raise TinConfigNotFound(filename)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# apeye documentation build configuration file, created by
+# tin documentation build configuration file, created by
 # sphinx-quickstart on Thu Oct 26 17:06:23 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -58,7 +58,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'apeye'
+project = 'tin'
 copyright = '2015-2021, Mike Culbertson'
 author = 'Mike Culbertson'
 
@@ -124,7 +124,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'apeyedoc'
+htmlhelp_basename = 'tindoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -151,7 +151,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'apeye.tex', 'apeye Documentation',
+    (master_doc, 'tin.tex', 'tin Documentation',
      'Mike Culbertson', 'manual'),
 ]
 
@@ -161,7 +161,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'apeye', 'apeye Documentation',
+    (master_doc, 'tin', 'tin Documentation',
      [author], 1)
 ]
 
@@ -172,8 +172,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'apeye', 'apeye Documentation',
-     author, 'apeye', 'One line description of project.',
+    (master_doc, 'tin', 'tin Documentation',
+     author, 'tin', 'One line description of project.',
      'Miscellaneous'),
 ]
 

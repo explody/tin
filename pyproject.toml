@@ -3,7 +3,7 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "apeye"
+name = "tin"
 authors = [{name = "Mike Culbertson", email = "mikeculbertson@protonmail.com"}]
 readme = "README.md"
 classifiers = [
@@ -16,4 +16,4 @@ classifiers = [
 dynamic = ["version", "description"]
 
 [project.urls]
-Home = "https://gitlab.com/explody/apeye"
+Home = "https://gitlab.com/explody/tin"

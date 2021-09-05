@@ -3,27 +3,27 @@ import requests
 import simplejson as json
 import urllib
 
-from apeye.auth import HTTPGenericHeaderAuth, HTTPGenericParameterAuth
-from apeye.base import ApeyeApiBase, ApeyeApiClass
-from apeye.config import ApeyeConfig
-from apeye.exceptions import ApeyeInvalidArgs, ApeyeError, ApeyeObjectNotFound
-from apeye.models import ApeyeApiModel
-from apeye.response import ApeyeApiResponseFactory
+from tin.auth import HTTPGenericHeaderAuth, HTTPGenericParameterAuth
+from tin.base import TinApiBase, TinApiClass
+from tin.config import TinConfig
+from tin.exceptions import TinInvalidArgs, TinError, TinObjectNotFound
+from tin.models import TinApiModel
+from tin.response import TinApiResponseFactory
 
 from deepmerge import always_merger
 
 
-class ApeyeApi(ApeyeApiClass):
-    """The ApeyeApi class represents a complete REST API
+class TinApi(TinApiClass):
+    """The TinApi class represents a complete REST API
 
     This represents a parent class which contains the object hierarchy which
     will represent the endpoints of the defined REST API.
 
     Args:
-        **kwargs: Arbitrary keyword arguments which will be passed to ApeyeConfig
+        **kwargs: Arbitrary keyword arguments which will be passed to TinConfig
 
     Attributes:
-        conf (ApeyeConfig): An ApeyeConfig object representing the configuration for
+        conf (TinConfig): An TinConfig object representing the configuration for
             this API
         tokenre (sre): Compiled regex for locating tokens in the url path string
     """
@@ -31,7 +31,7 @@ class ApeyeApi(ApeyeApiClass):
     def __init__(self, **kwargs):
         super().__init__()
 
-        self.conf = ApeyeConfig(**kwargs)
+        self.conf = TinConfig(**kwargs)
         self.obj_path = self.conf.api_name
 
         self._headers = self.conf.headers
@@ -50,14 +50,14 @@ class ApeyeApi(ApeyeApiClass):
 
         for cls_name, cls_data in api_data.items():
 
-            new_type = type(cls_name, (ApeyeApiClass,), {})
+            new_type = type(cls_name, (TinApiClass,), {})
             container_path = "{}.{}".format(obj_path, cls_name)
             setattr(new_type, "_obj_path", container_path)
 
             if cls_data.get("model"):
 
                 model_data = self.conf.models.get(cls_data["model"], {})
-                model_type = type(cls_data["model"], (ApeyeApiModel,), model_data)
+                model_type = type(cls_data["model"], (TinApiModel,), model_data)
                 setattr(new_type, "_model", model_type)
                 setattr(
                     model_type,
@@ -80,11 +80,11 @@ class ApeyeApi(ApeyeApiClass):
             if cls_data.get("methods"):
                 # If a child node has 'methods', it's an endpoint
 
-                # For each defined method, add an ApeyeApiMethod as
-                # an attribute in the current ApeyeApiClass instance
+                # For each defined method, add an TinApiMethod as
+                # an attribute in the current TinApiClass instance
                 for mth, mth_data in cls_data["methods"].items():
 
-                    new_method = ApeyeApiMethod(self, new_obj, mth, mth_data)
+                    new_method = TinApiMethod(self, new_obj, mth, mth_data)
                     new_method.obj_path = "{}.{}".format(container_path, mth)
 
                     new_obj.add_method(mth, new_method)
@@ -142,23 +142,23 @@ class ApeyeApi(ApeyeApiClass):
             return None
 
 
-class ApeyeApiMethod(ApeyeApiBase):
+class TinApiMethod(TinApiBase):
     def __init__(self, apiobj, clsobj, name, method_data, obj_path=None):
         """
-        The ApeyeApiMethod represents an endpoint method to call on a remote REST API.
+        The TinApiMethod represents an endpoint method to call on a remote REST API.
 
         Args:
-            apiobj (ApeyeApi): The parent object that contains all classes and methods
+            apiobj (TinApi): The parent object that contains all classes and methods
                 of this API
-            clsobj (ApeyeApiClass): The parent object of this method
+            clsobj (TinApiClass): The parent object of this method
             name (str): The name of this method
             method_data (dict): A set of information about this method as defined in
                 the config YAML
 
         Attributes:
             name (str): The method name
-            api (ApeyeApi): The toplevel APi object
-            cls (ApeyeApiClass): The immediate parent ApeyeApiClass object
+            api (TinApi): The toplevel APi object
+            cls (TinApiClass): The immediate parent TinApiClass object
             method_data (dict): A set of k->v information about the method
 
         """
@@ -250,7 +250,7 @@ class ApeyeApiMethod(ApeyeApiBase):
         params = self.default_params.copy()
         tokens = self.default_tokens.copy()
 
-        # if this is true, ApeyeApiResponseFactory will not instantiate model instances
+        # if this is true, TinApiResponseFactory will not instantiate model instances
         # from response data, and just return JSON.  Default is False.
         nomodel = kwargs.pop("nomodel") if "nomodel" in kwargs else False
 
@@ -281,7 +281,7 @@ class ApeyeApiMethod(ApeyeApiBase):
         # Ensure all our path tokens are accounted for
         for tok in self.path_tokens():
             if tok not in tokens:
-                raise ApeyeInvalidArgs(
+                raise TinInvalidArgs(
                     "%s called with missing token "
                     "argument %s. For path %s" % (self, tok, self.path)
                 )
@@ -299,7 +299,7 @@ class ApeyeApiMethod(ApeyeApiBase):
                 try:
                     requests_method = getattr(self.api.request, self.method.lower())
                 except AttributeError:
-                    raise ApeyeError("Invalid HTTP method: {}".format(self.method))
+                    raise TinError("Invalid HTTP method: {}".format(self.method))
 
                 # Common arguments with all methods
                 request_args = {
@@ -319,12 +319,12 @@ class ApeyeApiMethod(ApeyeApiBase):
                 response = requests_method(url, **request_args)
 
                 if response.status_code == 404:
-                    raise ApeyeObjectNotFound(
+                    raise TinObjectNotFound(
                         "Object not found. Tried: {}. "
                         "Remote API says: {}".format(url, response.text)
                     )
                 elif response.status_code not in self.expect_return_codes:
-                    raise ApeyeError(
+                    raise TinError(
                         "ERROR at {} Got return code {}, expected {}. "
                         "Remote API says: {}".format(
                             url,
@@ -342,7 +342,7 @@ class ApeyeApiMethod(ApeyeApiBase):
                         current_response_data = response.json()
                     except Exception:
                         # FIXME: excessively generic exception
-                        raise ApeyeError(
+                        raise TinError(
                             "ERROR decoding response JSON. "
                             "Raw response is: {}".format(response.content)
                         )
@@ -364,7 +364,7 @@ class ApeyeApiMethod(ApeyeApiBase):
                 # This next bit appears to have been almost exclusively for Oomnitza and
                 # their weird header-based paginating.  I'll leave it here for reference
                 # if we find enough APIs that do something like this but otherwise I
-                # think this would be better in the code using Apeye.
+                # think this would be better in the code using Tin.
 
                 # # Handle pagination types
                 # # "header_count" expects a total passed over in the HTTP header
@@ -395,7 +395,7 @@ class ApeyeApiMethod(ApeyeApiBase):
                 #         break
 
         except requests.exceptions.HTTPError as e:
-            raise ApeyeError("ERROR: %s" % e)
+            raise TinError("ERROR: %s" % e)
 
-        response_factory = ApeyeApiResponseFactory()
+        response_factory = TinApiResponseFactory()
         return response_factory(response_data, response, self, nomodel)

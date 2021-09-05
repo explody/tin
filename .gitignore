@@ -16,7 +16,7 @@ vagrant.yml
 .coverage
 htmlcov
 
-apeye.egg-info
+tin.egg-info
 doc/_build
 
 # old APIs

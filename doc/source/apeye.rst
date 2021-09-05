@@ -1,69 +1,69 @@
-apeye package
+tin package
 =============
 
 Submodules
 ----------
 
-apeye.api module
+tin.api module
 ----------------
 
-.. automodule:: apeye.api
+.. automodule:: tin.api
    :members:
    :undoc-members:
    :show-inheritance:
 
-apeye.auth module
+tin.auth module
 -----------------
 
-.. automodule:: apeye.auth
+.. automodule:: tin.auth
    :members:
    :undoc-members:
    :show-inheritance:
 
-apeye.base module
+tin.base module
 -----------------
 
-.. automodule:: apeye.base
+.. automodule:: tin.base
    :members:
    :undoc-members:
    :show-inheritance:
 
-apeye.config module
+tin.config module
 -------------------
 
-.. automodule:: apeye.config
+.. automodule:: tin.config
    :members:
    :undoc-members:
    :show-inheritance:
 
-apeye.exceptions module
+tin.exceptions module
 -----------------------
 
-.. automodule:: apeye.exceptions
+.. automodule:: tin.exceptions
    :members:
    :undoc-members:
    :show-inheritance:
 
-apeye.models module
+tin.models module
 -------------------
 
-.. automodule:: apeye.models
+.. automodule:: tin.models
    :members:
    :undoc-members:
    :show-inheritance:
 
-apeye.response module
+tin.response module
 ---------------------
 
-.. automodule:: apeye.response
+.. automodule:: tin.response
    :members:
    :undoc-members:
    :show-inheritance:
 
-apeye.version module
+tin.version module
 --------------------
 
-.. automodule:: apeye.version
+.. automodule:: tin.version
    :members:
    :undoc-members:
    :show-inheritance:
@@ -71,7 +71,7 @@ apeye.version module
 Module contents
 ---------------
 
-.. automodule:: apeye
+.. automodule:: tin
    :members:
    :undoc-members:
    :show-inheritance:

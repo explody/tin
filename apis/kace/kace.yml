@@ -4,7 +4,7 @@ environments:
     host: yourhost.com
     scheme: https
     port: 443
-    credfile: ~/.apeye/apis/kace/production.yml
+    credfile: ~/.tin/apis/kace/production.yml
     authtype: none
     use_session: true
     ssl:

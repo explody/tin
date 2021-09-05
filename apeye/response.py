@@ -1,7 +1,7 @@
-from apeye.exceptions import ApeyeError
+from tin.exceptions import TinError
 
 
-class ApeyeApiResponse(object):
+class TinApiResponse(object):
     def __init__(self, response_data, response, method):
         self._response = response
         self._response_data = response_data
@@ -20,10 +20,10 @@ class ApeyeApiResponse(object):
         return self._response_data
 
 
-class ApeyeApiResponseDict(ApeyeApiResponse, dict):
+class TinApiResponseDict(TinApiResponse, dict):
     def __init__(self, response_data, response, method, nomodel=False):
 
-        ApeyeApiResponse.__init__(self, response_data, response, method)
+        TinApiResponse.__init__(self, response_data, response, method)
 
         new_data = dict(response_data)
 
@@ -41,9 +41,9 @@ class ApeyeApiResponseDict(ApeyeApiResponse, dict):
         dict.__init__(self, new_data)
 
 
-class ApeyeApiResponseList(ApeyeApiResponse, list):
+class TinApiResponseList(TinApiResponse, list):
     def __init__(self, response_data, response, method, nomodel=False):
-        ApeyeApiResponse.__init__(self, response_data, response, method)
+        TinApiResponse.__init__(self, response_data, response, method)
 
         obj_list = []
 
@@ -56,20 +56,20 @@ class ApeyeApiResponseList(ApeyeApiResponse, list):
         list.__init__(self, obj_list)
 
 
-class ApeyeApiResponseString(ApeyeApiResponse, str):
+class TinApiResponseString(TinApiResponse, str):
     def __init__(self, response_data, response, method):
-        ApeyeApiResponse.__init__(self, response_data, response, method)
+        TinApiResponse.__init__(self, response_data, response, method)
         str.__init__(self, response_data)
 
 
-class ApeyeApiResponseNoContent(ApeyeApiResponse):
+class TinApiResponseNoContent(TinApiResponse):
     def __init__(self, response_data, response, method):
-        ApeyeApiResponse.__init__(self, response_data, response, method)
+        TinApiResponse.__init__(self, response_data, response, method)
 
 
-class ApeyeApiResponseSingleton(ApeyeApiResponse, dict):
+class TinApiResponseSingleton(TinApiResponse, dict):
     def __init__(self, response_data, response, method, nomodel=False):
-        ApeyeApiResponse.__init__(self, response_data, response, method)
+        TinApiResponse.__init__(self, response_data, response, method)
         self.model_instance = None
         if (
             hasattr(method.cls, "singleton_data_key")
@@ -80,7 +80,7 @@ class ApeyeApiResponseSingleton(ApeyeApiResponse, dict):
             singleton_data = response_data
 
         if not isinstance(singleton_data, dict):
-            raise ApeyeError(
+            raise TinError(
                 "Method {} is configured as singleton but I received a {} from "
                 "the API.  Singletons can only be built from dicts".format(
                     method, type(singleton_data)
@@ -98,18 +98,18 @@ class ApeyeApiResponseSingleton(ApeyeApiResponse, dict):
         return self.model_instance if self.model_instance else self
 
 
-class ApeyeApiResponseFactory(object):
+class TinApiResponseFactory(object):
     def __call__(self, response_data, response, method, nomodel=False):
         if getattr(method, "expect_return_data", None) == "singleton":
-            singleton = ApeyeApiResponseSingleton(
+            singleton = TinApiResponseSingleton(
                 response_data, response, method, nomodel
             )
             return singleton.instance()
         if isinstance(response_data, list):
-            return ApeyeApiResponseList(response_data, response, method, nomodel)
+            return TinApiResponseList(response_data, response, method, nomodel)
         elif isinstance(response_data, dict):
-            return ApeyeApiResponseDict(response_data, response, method, nomodel)
+            return TinApiResponseDict(response_data, response, method, nomodel)
         elif isinstance(response_data, str):
-            return ApeyeApiResponseString(response_data, response, method)
+            return TinApiResponseString(response_data, response, method)
         elif response_data is None and response.status_code == 204:
-            return ApeyeApiResponseNoContent(response_data, response, method)
+            return TinApiResponseNoContent(response_data, response, method)

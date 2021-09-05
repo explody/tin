@@ -1,7 +1,7 @@
 import os
 import glob
 from setuptools import setup
-from apeye.version import VERSION
+from tin.version import VERSION
 
 
 def read(fname):
@@ -15,7 +15,7 @@ for directory in directories:
     data_files.append((directory, files))
 
 setup(
-    name="apeye",
+    name="tin",
     version=VERSION,
     author="Mike Culbertson",
     author_email="mikeculbertson@protonmail.com",
@@ -23,8 +23,8 @@ setup(
     "with API information defined in YAML",
     license="Apache",
     keywords="",
-    url="https://gitlab.com/explody/apeye",
-    packages=["apeye"],
+    url="https://gitlab.com/explody/tin",
+    packages=["tin"],
     long_description=read("README.md"),
     classifiers=[
         "Development Status :: 4 - Beta",

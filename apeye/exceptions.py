@@ -1,5 +1,5 @@
-class ApeyeError(Exception):
-    """Generic Apeye exception"""
+class TinError(Exception):
+    """Generic Tin exception"""
 
     def __init__(self, value):
         self.value = value
@@ -8,7 +8,7 @@ class ApeyeError(Exception):
         return repr(self.value)
 
 
-class ApeyeConfigNotFound(Exception):
+class TinConfigNotFound(Exception):
     """Config file not found exception"""
 
     def __init__(self, filename):
@@ -18,18 +18,18 @@ class ApeyeConfigNotFound(Exception):
         return self.value
 
 
-class ApeyeObjectNotFound(ApeyeError):
+class TinObjectNotFound(TinError):
     """Exception thrown for 404 errors"""
 
     def __init__(self, value):
         super().__init__(value)
 
 
-class ApeyeInvalidArgs(Exception):
+class TinInvalidArgs(Exception):
     def __init__(self, value):
         super().__init__(value)
 
 
-class ApeyeModelError(ApeyeError):
+class TinModelError(TinError):
     def __init__(self, value):
         super().__init__(value)

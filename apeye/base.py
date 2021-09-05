@@ -1,7 +1,7 @@
 import json
 
 
-class ApeyeApiBase(object):
+class TinApiBase(object):
 
     _obj_path = None
 
@@ -24,8 +24,8 @@ class ApeyeApiBase(object):
         self._obj_path = obj_path
 
 
-class ApeyeApiClass(ApeyeApiBase):
-    """Simple class for holding additional ApeyeApiClass's and ApeyeApiMethod's"""
+class TinApiClass(TinApiBase):
+    """Simple class for holding additional TinApiClass's and TinApiMethod's"""
 
     _model = None
 

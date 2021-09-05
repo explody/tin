@@ -1,8 +1,8 @@
-from apeye.api import ApeyeApiClass
+from tin.api import TinApiClass
 
 
 def test_generic_class_basic():
-    api = ApeyeApiClass()
+    api = TinApiClass()
 
     assert api.obj_path is None
     assert api.classes() == []
@@ -10,54 +10,54 @@ def test_generic_class_basic():
 
 
 def test_generic_class_empty_tree():
-    api = ApeyeApiClass()
+    api = TinApiClass()
     assert api.tree() == {api: {"classes": {}, "methods": [], "model": None}}
 
 
 def test_generic_class_empty_json():
-    api = ApeyeApiClass()
+    api = TinApiClass()
     assert (
         api.to_json()
-        == '{"ApeyeApiClass": {"classes": {}, "methods": [], "model": null}}'
+        == '{"TinApiClass": {"classes": {}, "methods": [], "model": null}}'
     )
 
 
 def test_generic_class_repr():
-    api = ApeyeApiClass()
-    assert "{}".format(api) == "ApeyeApiClass"
+    api = TinApiClass()
+    assert "{}".format(api) == "TinApiClass"
 
 
 def test_generic_class_set_path():
-    api = ApeyeApiClass()
+    api = TinApiClass()
     api.obj_path = "/api/path"
     assert api.obj_path == "/api/path"
 
 
 def test_generic_class_add_method():
-    api = ApeyeApiClass()
+    api = TinApiClass()
     fakemethod = object()
     api.add_method("mymethod", fakemethod)
     assert api.methods() == [fakemethod]
 
 
 def test_generic_class_add_class():
-    api = ApeyeApiClass()
-    myclass = ApeyeApiClass()
+    api = TinApiClass()
+    myclass = TinApiClass()
     api.add_class("myclass", myclass)
     assert api.classes() == [myclass]
 
 
 def test_generic_class_get_class():
-    api = ApeyeApiClass()
+    api = TinApiClass()
     myclass = object
     api.add_class("myclass", myclass)
     assert api.get_class("myclass") is myclass
 
 
 def test_generic_class_tree():
-    api = ApeyeApiClass()
-    myclass = ApeyeApiClass()
-    nextclass = ApeyeApiClass()
+    api = TinApiClass()
+    myclass = TinApiClass()
+    nextclass = TinApiClass()
     myclass.add_class("NextClass", nextclass)
     mymethod = object()
     nextclass.add_method("nextmethod", mymethod)

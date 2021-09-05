@@ -22,7 +22,7 @@ test:
   script:
     - pip install -r requirements.txt
     - pip install pytest yamllint setuptools pytest_httpserver pytest-cov
-    - python -m pytest --junitxml=report.xml --cov=apeye/
+    - python -m pytest --junitxml=report.xml --cov=tin/
     - coverage xml
     - python -m yamllint apis/
   artifacts:

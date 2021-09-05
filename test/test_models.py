@@ -2,15 +2,15 @@ import json
 import pytest
 import requests
 
-from apeye.api import ApeyeApi, ApeyeApiMethod
-from apeye.exceptions import ApeyeError
-from apeye.models import ApeyeApiModel
+from tin.api import TinApi, TinApiMethod
+from tin.exceptions import TinError
+from tin.models import TinApiModel
 from pytest_httpserver import HTTPServer
 
 
 def api_inst(env="basic", config="test/data/api/testservice.yml"):
     # Just a shortcut to keep the repeating text down
-    return ApeyeApi(config_file=config, environment=env)
+    return TinApi(config_file=config, environment=env)
 
 
 @pytest.fixture(scope="session")
@@ -20,7 +20,7 @@ def httpserver_listen_address():
 
 def test_model_basic():
     data = {'one': 1, 'two': 'two'}
-    model = ApeyeApiModel(data)
+    model = TinApiModel(data)
     model.newthing = "newval"
 
     assert model._data == data
@@ -38,7 +38,7 @@ def test_model_basic():
 
 def test_model_load():
     data = {'id': 1, "name": "test"}
-    model = ApeyeApiModel(data)
+    model = TinApiModel(data)
     model.load({'id': 1, "name": "new name"})
 
     assert model.name == "new name"
@@ -46,7 +46,7 @@ def test_model_load():
 
 def test_model_merge():
     data = {'id': 1, "name": "test"}
-    model = ApeyeApiModel(data)
+    model = TinApiModel(data)
     model.merge({'newkey': "new value"})
 
     assert model.id == 1
@@ -56,12 +56,12 @@ def test_model_merge():
 
 def test_model_loadmerge_bad_id():
     data = {'id': 1, "name": "test"}
-    model = ApeyeApiModel(data)
+    model = TinApiModel(data)
 
-    with pytest.raises(ApeyeError):
+    with pytest.raises(TinError):
         model.load({'id': 2, "name": "test"})
 
-    with pytest.raises(ApeyeError):
+    with pytest.raises(TinError):
         model.merge({'id': 2, "name": "test"})
 
 
@@ -79,7 +79,7 @@ def test_misconfigured_singleton(httpserver: HTTPServer):
     ).respond_with_json(["one", "two", "three"], status=201)
     testservice = api_inst()
 
-    with pytest.raises(ApeyeError):
+    with pytest.raises(TinError):
         testservice.container.subcontainer.create(data={"send": "this"})
 
 
@@ -97,8 +97,8 @@ def test_singleton_model(httpserver: HTTPServer):
         "description": "basic data to build model",
     }
 
-    assert type(instance.api_method("create")) is ApeyeApiMethod
-    assert type(instance.api_method("update")) is ApeyeApiMethod
+    assert type(instance.api_method("create")) is TinApiMethod
+    assert type(instance.api_method("update")) is TinApiMethod
 
 
 def test_singleton_model_with_key(httpserver: HTTPServer):
@@ -129,7 +129,7 @@ def test_singleton_model_with_key(httpserver: HTTPServer):
         "description": "basic data to build model",
     }
 
-    assert type(instance.api_method("create")) is ApeyeApiMethod
+    assert type(instance.api_method("create")) is TinApiMethod
 
 
 def test_model_dict(httpserver: HTTPServer):
@@ -160,8 +160,8 @@ def test_model_dict(httpserver: HTTPServer):
         assert type(instance.raw) is dict
         assert hasattr(instance, "create")
         assert hasattr(instance, "delete")
-        assert type(instance.api_method("create")) is ApeyeApiMethod
-        assert type(instance.api_method("delete")) is ApeyeApiMethod
+        assert type(instance.api_method("create")) is TinApiMethod
+        assert type(instance.api_method("delete")) is TinApiMethod
 
 
 def test_model_list(httpserver: HTTPServer):
@@ -188,8 +188,8 @@ def test_model_list(httpserver: HTTPServer):
     for instance in instances:
         assert type(instance) is testservice.container.subcontainer.model
         assert type(instance.raw) is dict
-        assert type(instance.api_method("create")) is ApeyeApiMethod
-        assert type(instance.api_method("delete")) is ApeyeApiMethod
+        assert type(instance.api_method("create")) is TinApiMethod
+        assert type(instance.api_method("delete")) is TinApiMethod
 
 
 def test_existing_model_save(httpserver: HTTPServer):
@@ -264,10 +264,10 @@ def test_modify_unsaved():
     instance = testservice.container.subcontainer.model(
         {"name": "initial name", "description": "initial description"}
     )
-    with pytest.raises(ApeyeError):
+    with pytest.raises(TinError):
         instance.delete()
 
-    with pytest.raises(ApeyeError):
+    with pytest.raises(TinError):
         instance.update({})
 
 

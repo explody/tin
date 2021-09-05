@@ -1,66 +1,66 @@
 import os
 import pytest
 
-from apeye.config import ApeyeConfig
-from apeye.exceptions import ApeyeError, ApeyeConfigNotFound
+from tin.config import TinConfig
+from tin.exceptions import TinError, TinConfigNotFound
 
 
 def arg_config_yml():
-    return ApeyeConfig("test/data/api/testservice.yml", "basic")
+    return TinConfig("test/data/api/testservice.yml", "basic")
 
 
 def arg_config_json():
-    return ApeyeConfig("test/data/api/testservice.json", "basic")
+    return TinConfig("test/data/api/testservice.json", "basic")
 
 
 def env_config():
-    os.environ["APEYE_CONFIG"] = "test/data/api/testservice.yml"
-    os.environ["APEYE_ENV"] = "basic"
-    ac = ApeyeConfig()
-    os.environ.pop("APEYE_CONFIG")
-    os.environ.pop("APEYE_ENV")
+    os.environ["TIN_CONFIG"] = "test/data/api/testservice.yml"
+    os.environ["TIN_ENV"] = "basic"
+    ac = TinConfig()
+    os.environ.pop("TIN_CONFIG")
+    os.environ.pop("TIN_ENV")
     return ac
 
 
 def test_arg_config_yml():
-    assert type(arg_config_yml()) is ApeyeConfig
+    assert type(arg_config_yml()) is TinConfig
 
 
 def test_config_with_env():
-    assert type(env_config()) is ApeyeConfig
+    assert type(env_config()) is TinConfig
 
 
 def test_arg_config_json():
-    assert type(arg_config_json()) is ApeyeConfig
+    assert type(arg_config_json()) is TinConfig
 
 
 def test_no_config():
-    with pytest.raises(ApeyeError):
-        ApeyeConfig(None, None)
+    with pytest.raises(TinError):
+        TinConfig(None, None)
 
 
 def test_no_environment():
-    with pytest.raises(ApeyeError):
-        ApeyeConfig("test/data/api/testservice.yml", None)
+    with pytest.raises(TinError):
+        TinConfig("test/data/api/testservice.yml", None)
 
 
 def test_bad_config():
-    with pytest.raises(ApeyeConfigNotFound):
-        ApeyeConfig("nosuchfile.yml", "fake")
+    with pytest.raises(TinConfigNotFound):
+        TinConfig("nosuchfile.yml", "fake")
 
 
 def test_empty_config():
-    with pytest.raises(ApeyeError):
-        ApeyeConfig("test/data/api/empty.yml", "fake")
+    with pytest.raises(TinError):
+        TinConfig("test/data/api/empty.yml", "fake")
 
 
 def test_bad_environment():
-    with pytest.raises(ApeyeError):
-        ApeyeConfig("test/data/api/testservice.yml", "nosuchenv")
+    with pytest.raises(TinError):
+        TinConfig("test/data/api/testservice.yml", "nosuchenv")
 
 
 def test_no_models():
-    ac = ApeyeConfig("test/data/api/testservice.yml", "no_models")
+    ac = TinConfig("test/data/api/testservice.yml", "no_models")
     assert ac.models == {}
 
 

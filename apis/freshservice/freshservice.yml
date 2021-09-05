@@ -4,7 +4,7 @@ environments:
     host: yourhost.freshservice.com
     scheme: https
     port: 443
-    credfile: ~/.apeye/apis/freshservice/production.yml
+    credfile: ~/.tin/apis/freshservice/production.yml
     authtype: basic
     ssl:
       verify: true
