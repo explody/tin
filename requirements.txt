@@ -2,3 +2,4 @@ requests~=2.22.0
 simplejson~=3.17.2
 pyyaml>=5.4
 deepmerge~=0.3.0
+setuptools~=57.5.0

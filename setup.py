@@ -18,7 +18,7 @@ setup(
     name="tin",
     version=VERSION,
     author="Mike Culbertson",
-    author_email="mikeculbertson@protonmail.com",
+    author_email="_fsck@itsdown.org",
     description="Minimal REST API client wrapper around python-requests, "
     "with API information defined in YAML",
     license="Apache",

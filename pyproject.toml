@@ -4,14 +4,16 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "tin"
-authors = [{name = "Mike Culbertson", email = "mikeculbertson@protonmail.com"}]
+authors = [{name = "Mike Culbertson", email = "_fsck@itsdown.org"}]
 readme = "README.md"
+requires-python = ">=3.6"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Environment :: Web Environment",
     "License :: OSI Approved :: Apache Software License",
-    "Programming Language :: Python :: 3"
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only"
 ]
 dynamic = ["version", "description"]
 
