@@ -35,7 +35,101 @@ agents:
     list_fields:
       method: GET
       path: /agents/:id/agent_fields
-
+requesters:
+  list_data_key: "requesters"
+  model: requester
+  methods:
+    create:
+      method: POST
+      path: /requesters
+      object_method: create
+      expect: 201
+    get:
+      method: GET
+      path: /requesters/:id
+      object_method: read
+    list:
+      method: GET
+      path: /requesters
+    update:
+      method: PUT
+      path: /requesters/:id
+      object_method: update
+    deactivate:
+      method: DELETE
+      path: /requesters/:id
+    forget:
+      method: DELETE
+      path: /requesters/:id/forget
+      object_method: delete
+    reactivate:
+      method: PUT
+      path: /requesters/:id/reactivate
+    convert_to_agent:
+      method: PUT
+      path: /requesters/:id/convert_to_agent
+    merge:
+      method: PUT
+      path: /requesters/:id/convert_to_agent
+    list_fields:
+      method: GET
+      path: /requesters/:id/requester_fields
+groups:
+  list_data_key: "groups"
+  methods:
+    create:
+      method: POST
+      path: /groups
+      object_method: create
+      expect: 201
+    get:
+      method: GET
+      path: /groups/:id
+      object_method: read
+    list:
+      method: GET
+      path: /groups
+    update:
+      method: PUT
+      path: /groups/:id
+      object_method: update
+    delete:
+      method: DELETE
+      path: /groups/:id
+      expect: 204
+roles:
+  list_data_key: "roles"
+  methods:
+    get:
+      method: GET
+      path: /roles/:id
+    list:
+      method: GET
+      path: /roles
+departments:
+  list_data_key: "departments"
+  model: department
+  methods:
+    create:
+      method: POST
+      path: /departments
+      object_method: create
+      expect: 200   # what?! but yes, 200
+    get:
+      method: GET
+      path: /departments/:id
+      object_method: read
+    list:
+      method: GET
+      path: /departments
+    update:
+      method: PUT
+      path: /departments/:id
+      object_method: update
+    delete:
+      method: DELETE
+      path: /departments/:id
+      expect: 204
 assets:
   methods:
     list:
@@ -80,29 +174,6 @@ solutions:
         path: /solutions/categories/:id
         object_method: delete
         expect: 204
-groups:
-  list_data_key: "groups"
-  methods:
-    create:
-      method: POST
-      path: /groups
-      object_method: create
-      expect: 201
-    get:
-      method: GET
-      path: /groups/:id
-      object_method: read
-    list:
-      method: GET
-      path: /groups
-    update:
-      method: PUT
-      path: /groups/:id
-      object_method: update
-    delete:
-      method: DELETE
-      path: /groups/:id
-      expect: 204
   folders:
     model: folder
     response_object_path: "folders"
@@ -139,54 +210,6 @@ groups:
       delete:
         method: PUT
         path: /solutions/articles/:id
-requesters:
-  list_data_key: "requesters"
-  model: requester
-  methods:
-    create:
-      method: POST
-      path: /requesters
-      object_method: create
-      expect: 201
-    get:
-      method: GET
-      path: /requesters/:id
-      object_method: read
-    list:
-      method: GET
-      path: /requesters
-    update:
-      method: PUT
-      path: /requesters/:id
-      object_method: update
-    deactivate:
-      method: DELETE
-      path: /requesters/:id
-    forget:
-      method: DELETE
-      path: /requesters/:id/forget
-      object_method: delete
-    reactivate:
-      method: PUT
-      path: /requesters/:id/reactivate
-    convert_to_agent:
-      method: PUT
-      path: /requesters/:id/convert_to_agent
-    merge:
-      method: PUT
-      path: /requesters/:id/convert_to_agent
-    list_fields:
-      method: GET
-      path: /requesters/:id/requester_fields
-roles:
-  list_data_key: "roles"
-  methods:
-    get:
-      method: GET
-      path: /roles/:id
-    list:
-      method: GET
-      path: /roles
 service_items:
   list_data_key: "service_items"
   methods:
@@ -201,3 +224,6 @@ tickets:
     list:
       method: GET
       path: /tickets
+    activities:
+      method: GET
+      path: /tickets/:id/activities

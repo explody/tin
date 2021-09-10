@@ -28,19 +28,6 @@ agent:
     - member_of
     - signature
     - custom_fields
-category:
-  attrs:
-    - id
-    - name
-    - description
-    - position
-    - default_category
-    - created_at
-    - updated_at
-  must:
-    - name
-  may:
-    - description
 requester:
   id_attr: id
   read:
@@ -70,3 +57,27 @@ requester:
     - location_id
     - background_information
     - custom_fields
+department:
+  id_attr: id
+  read:
+    - id
+  must:
+    - name
+  may:
+    - description
+    - head_user_id
+    - prime_user_id
+    - domains
+category:
+  attrs:
+    - id
+    - name
+    - description
+    - position
+    - default_category
+    - created_at
+    - updated_at
+  must:
+    - name
+  may:
+    - description
