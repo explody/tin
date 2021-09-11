@@ -29,7 +29,7 @@ test:
     - pwd
     - find / -name coverage
     - cat /builds/explody/tin/venv/bin/coverage
-    - /builds/explody/tin/venv/bin/coverage xml
+    - python venv/bin/coverage xml
     - python -m yamllint apis/
   artifacts:
     when: always
