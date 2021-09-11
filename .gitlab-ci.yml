@@ -23,13 +23,7 @@ test:
     - pip install -r requirements.txt
     - pip install pytest yamllint setuptools pytest_httpserver pytest-cov coverage
     - python -m pytest --junitxml=report.xml --cov=tin/
-    - which pip
-    - which python
-    - echo $PATH
-    - pwd
-    - find / -name coverage
-    - cat /builds/explody/tin/venv/bin/coverage
-    - python venv/bin/coverage xml
+    - coverage xml
     - python -m yamllint apis/
   artifacts:
     when: always
