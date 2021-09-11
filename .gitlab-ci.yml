@@ -27,6 +27,8 @@ test:
     - which python
     - echo $PATH
     - pwd
+    - find / -name coverage
+    - cat /builds/explody/tin/venv/bin/coverage
     - /builds/explody/tin/venv/bin/coverage xml
     - python -m yamllint apis/
   artifacts:
