@@ -3,12 +3,22 @@ from tin.exceptions import TinModelError, TinError
 from deepmerge import always_merger
 import simplejson as json
 
+DEFAULT_API_METHODS = {"create": None, "read": None, "update": None, "delete": None}
+DEFAULT_ID_ATTR = 'id'
+
+
+class TinApiModelFactory(object):
+
+    def __call__(self, name, data):
+        new_model_type = type(name, (TinApiModel,), data)
+        new_model_type.API_METHODS = dict(DEFAULT_API_METHODS)
+        new_model_type.id_attr = data.get('id_attr', False) or str(DEFAULT_ID_ATTR)
+
+        return new_model_type
+
 
 class TinApiModel(TinApiBase):
 
-    API_METHODS = {"create": None, "read": None, "update": None, "delete": None}
-
-    id_attr = "id"
     _initialized = False
 
     def __init__(self, data={}):
@@ -17,8 +27,6 @@ class TinApiModel(TinApiBase):
         self._response_data = {}
         self._response = None
         self._data = data
-        if "id_attr" in data:
-            self.id_attr = data["id_attr"]
 
         # These aren't really immutables, just their existence is, for __setattr__
         self._immutables = dir(self)
@@ -42,6 +50,9 @@ class TinApiModel(TinApiBase):
                 return self.__dict__[item]
             else:
                 self.method_missing(item)
+
+    def add_method(self, name, method):
+        self.API_METHODS[name] = method
 
     def method_missing(self, method_name, *args, **kwargs):
         e = "type object '%s' has no attribute '%s'" % (

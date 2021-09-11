@@ -4,9 +4,11 @@ import requests
 
 from tin.api import TinApi, TinApiMethod
 from tin.exceptions import TinError
-from tin.models import TinApiModel
+from tin.models import TinApiModelFactory
 from pytest_httpserver import HTTPServer
 
+model_factory = TinApiModelFactory()
+model_type = model_factory('testmodel', {})
 
 def api_inst(env="basic", config="test/data/api/testservice.yml"):
     # Just a shortcut to keep the repeating text down
@@ -20,7 +22,7 @@ def httpserver_listen_address():
 
 def test_model_basic():
     data = {'one': 1, 'two': 'two'}
-    model = TinApiModel(data)
+    model = model_type(data)
     model.newthing = "newval"
 
     assert model._data == data
@@ -38,15 +40,16 @@ def test_model_basic():
 
 def test_model_load():
     data = {'id': 1, "name": "test"}
-    model = TinApiModel(data)
-    model.load({'id': 1, "name": "new name"})
+    model = model_type(data)
+    assert model.name == "test"
 
+    model.load({'id': 1, "name": "new name"})
     assert model.name == "new name"
 
 
 def test_model_merge():
     data = {'id': 1, "name": "test"}
-    model = TinApiModel(data)
+    model = model_type(data)
     model.merge({'newkey': "new value"})
 
     assert model.id == 1
@@ -56,7 +59,7 @@ def test_model_merge():
 
 def test_model_loadmerge_bad_id():
     data = {'id': 1, "name": "test"}
-    model = TinApiModel(data)
+    model = model_type(data)
 
     with pytest.raises(TinError):
         model.load({'id': 2, "name": "test"})

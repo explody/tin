@@ -7,7 +7,7 @@ from tin.auth import HTTPGenericHeaderAuth, HTTPGenericParameterAuth
 from tin.base import TinApiBase, TinApiClass
 from tin.config import TinConfig
 from tin.exceptions import TinInvalidArgs, TinError, TinObjectNotFound
-from tin.models import TinApiModel
+from tin.models import TinApiModelFactory
 from tin.response import TinApiResponseFactory
 
 from deepmerge import always_merger
@@ -41,6 +41,7 @@ class TinApi(TinApiClass):
 
         self.tokenre = re.compile(":([a-zA-Z0-9_-]+)")
 
+        self._model_factory = TinApiModelFactory()
         self._recurse_build_method_path(self, self.conf.apidata, self.obj_path)
 
     def _recurse_build_method_path(self, obj, api_data, obj_path=None):
@@ -57,7 +58,7 @@ class TinApi(TinApiClass):
             if cls_data.get("model"):
 
                 model_data = self.conf.models.get(cls_data["model"], {})
-                model_type = type(cls_data["model"], (TinApiModel,), model_data)
+                model_type = self._model_factory(cls_data["model"], model_data)
                 setattr(new_type, "_model", model_type)
                 setattr(
                     model_type,
@@ -102,6 +103,7 @@ class TinApi(TinApiClass):
             else:
                 # If there are no methods, it's a container class
                 self._recurse_build_method_path(new_obj, cls_data, container_path)
+
 
     @property
     def request(self):
@@ -166,6 +168,7 @@ class TinApiMethod(TinApiBase):
         self.api = apiobj
         self.cls = clsobj
         self._method_data = method_data
+        self._response_factory = TinApiResponseFactory()
 
         self.method = self._method_data["method"]
         self.object_method = self._method_data.get("object_method", None)
@@ -397,5 +400,4 @@ class TinApiMethod(TinApiBase):
         except requests.exceptions.HTTPError as e:
             raise TinError("ERROR: %s" % e)
 
-        response_factory = TinApiResponseFactory()
-        return response_factory(response_data, response, self, nomodel)
+        return self._response_factory(response_data, response, self, nomodel)
