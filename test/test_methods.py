@@ -288,5 +288,3 @@ def test_paginate_nested_dict(httpserver: HTTPServer):
         "one": ["one"],
         "two": {"item": "value"},
     }
-
-

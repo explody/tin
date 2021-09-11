@@ -116,14 +116,10 @@ class TinApiModel(TinApiBase):
         if "id" in data:
             data.pop("id")
 
-        self._data = self.CRUD_METHODS["create"](
-            data=data, nomodel=True, **kwargs
-        )
+        self._data = self.CRUD_METHODS["create"](data=data, nomodel=True, **kwargs)
 
     def read(self, **kwargs):
-        self._data = self.CRUD_METHODS["read"](
-            id=self.id, nomodel=True, **kwargs
-        )
+        self._data = self.CRUD_METHODS["read"](id=self.id, nomodel=True, **kwargs)
 
     def update(self, data, **kwargs):
         # Don't accept an id in kwargs here, is should be in _data
@@ -184,11 +180,11 @@ class TinApiModel(TinApiBase):
 
     @classmethod
     def method_names(cls):
-        return [k for k,v in cls.API_METHODS.items()]
+        return [k for k, v in cls.API_METHODS.items()]
 
     @classmethod
     def methods(cls):
-        return [v for k,v in cls.API_METHODS.items()]
+        return [v for k, v in cls.API_METHODS.items()]
 
     @classmethod
     def add_method(cls, name, method):

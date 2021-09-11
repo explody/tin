@@ -8,7 +8,8 @@ from tin.models import TinApiModelFactory
 from pytest_httpserver import HTTPServer
 
 model_factory = TinApiModelFactory()
-model_type = model_factory('testmodel', {})
+model_type = model_factory("testmodel", {})
+
 
 def api_inst(env="basic", config="test/data/api/testservice.yml"):
     # Just a shortcut to keep the repeating text down
@@ -21,15 +22,15 @@ def httpserver_listen_address():
 
 
 def test_model_basic():
-    data = {'one': 1, 'two': 'two'}
+    data = {"one": 1, "two": "two"}
     model = model_type(data)
     model.newthing = "newval"
 
     assert model._data == data
     assert model.one == 1
-    assert model.two == 'two'
+    assert model.two == "two"
     assert "newthing" in model._data
-    assert model.to_dict() == {'one': 1, 'two': 'two', 'newthing': 'newval'}
+    assert model.to_dict() == {"one": 1, "two": "two", "newthing": "newval"}
 
     with pytest.raises(AttributeError):
         print(model.doesntexist)
@@ -39,18 +40,18 @@ def test_model_basic():
 
 
 def test_model_load():
-    data = {'id': 1, "name": "test"}
+    data = {"id": 1, "name": "test"}
     model = model_type(data)
     assert model.name == "test"
 
-    model.load({'id': 1, "name": "new name"})
+    model.load({"id": 1, "name": "new name"})
     assert model.name == "new name"
 
 
 def test_model_merge():
-    data = {'id': 1, "name": "test"}
+    data = {"id": 1, "name": "test"}
     model = model_type(data)
-    model.merge({'newkey': "new value"})
+    model.merge({"newkey": "new value"})
 
     assert model.id == 1
     assert model.name == "test"
@@ -58,43 +59,47 @@ def test_model_merge():
 
 
 def test_model_loadmerge_bad_id():
-    data = {'id': 1, "name": "test"}
+    data = {"id": 1, "name": "test"}
     model = model_type(data)
 
     with pytest.raises(TinError):
-        model.load({'id': 2, "name": "test"})
+        model.load({"id": 2, "name": "test"})
 
     with pytest.raises(TinError):
-        model.merge({'id': 2, "name": "test"})
+        model.merge({"id": 2, "name": "test"})
 
 
 def test_other_id_attr():
     testservice = api_inst()
     instance = testservice.container.subcontainer2.model(
-        {"uuid": "639b410e70fe", "name": "initial name", "description": "initial description"}
+        {
+            "uuid": "639b410e70fe",
+            "name": "initial name",
+            "description": "initial description",
+        }
     )
-    assert instance.id == '639b410e70fe'
+    assert instance.id == "639b410e70fe"
 
 
 def test_add_all_methods():
     testservice = api_inst()
     assert testservice.container.subcontainer.model.method_names() == [
-        'list', 'get', 'create', 'update', 'delete'
+        "list",
+        "get",
+        "create",
+        "update",
+        "delete",
     ]
 
 
 def test_add_some_methods():
     testservice = api_inst()
-    assert testservice.container.subcontainer2.model.method_names() == [
-        'update'
-    ]
+    assert testservice.container.subcontainer2.model.method_names() == ["update"]
 
 
 def test_exclude_some_methods():
     testservice = api_inst()
-    assert testservice.container.subcontainer3.model.method_names() == [
-        'get'
-    ]
+    assert testservice.container.subcontainer3.model.method_names() == ["get"]
 
 
 def test_misconfigured_singleton(httpserver: HTTPServer):
@@ -303,16 +308,16 @@ def test_model_delete(httpserver: HTTPServer):
     httpserver.expect_request(
         "/api/stuff/whatnot/1",
         method="DELETE",
-    ).respond_with_data(
-        "", status=204
-    )
+    ).respond_with_data("", status=204)
     testservice = api_inst()
     instance = testservice.container.subcontainer.get(1)
     assert instance.delete() is None
 
 
 def test_model_read(httpserver: HTTPServer):
-    httpserver.expect_ordered_request("/api/stuff/whatnot/1", method="GET").respond_with_json(
+    httpserver.expect_ordered_request(
+        "/api/stuff/whatnot/1", method="GET"
+    ).respond_with_json(
         {"id": 1, "name": "original name", "description": "original description"}
     )
 
