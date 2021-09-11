@@ -1,4 +1,5 @@
-[![pipeline status](https://gitlab.com/explody/tin/badges/main/pipeline.svg)](https://gitlab.com/explody/tin/-/commits/main) [![coverage report](https://gitlab.com/explody/tin/badges/main/coverage.svg)](https://gitlab.com/explody/tin/-/commits/main)
+HEAD: [![pipeline status](https://gitlab.com/explody/tin/badges/main/pipeline.svg)](https://gitlab.com/explody/tin/-/commits/main) [![coverage report](https://gitlab.com/explody/tin/badges/main/coverage.svg)](https://gitlab.com/explody/tin/-/commits/main)
+Release: [![pipeline status](https://gitlab.com/explody/tin/badges/release/pipeline.svg)](https://gitlab.com/explody/tin/-/commits/release) [![coverage report](https://gitlab.com/explody/tin/badges/release/coverage.svg)](https://gitlab.com/explody/tin/-/commits/release)
 
 # Tin
 
@@ -6,10 +7,10 @@ Tin is a thin and minimal wrapper around [python requests](https://docs.python-r
 
 
 > **On the subject of Swagger/OpenAPI**
-> 
-> If the REST API you need to interact with publishes an OpenAPI spec, you very 
+>
+> If the REST API you need to interact with publishes an OpenAPI spec, you very
 > likely do not need Tin.  There are a variety of much more robust
-> [OpenAPI tools](https://openapi.tools/) that will generate API 
+> [OpenAPI tools](https://openapi.tools/) that will generate API
 > client code, among other functions.
 > Tin was made with services that _don't_ publish OpenAPI data in mind. That being said, it'll still work fine with any REST API that speaks JSON.
 
@@ -18,7 +19,7 @@ Tin is a thin and minimal wrapper around [python requests](https://docs.python-r
 * Supports multiple environment definitions per API
 * Basic, header and parameter based authentication
 * Credentials from a YML or JSON file, or environment vars
-* A minimal model system where lists of json dicts returned from a service 
+* A minimal model system where lists of json dicts returned from a service
   can be instantiated as custom objects with canned CRUD methods such
   as `.create()` and `.save()`
 * Simple field validation for models, for specifying required and/or read-only fields.
@@ -118,7 +119,7 @@ newthing.save()   # succeeds
 
 newthing.update({'name': 'new name'})  # updates instance and makes Update API call
 
-newthing.delete() 
+newthing.delete()
 
 ```
 
