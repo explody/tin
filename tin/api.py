@@ -81,6 +81,8 @@ class TinApi(TinApiClass):
             if cls_data.get("methods"):
                 # If a child node has 'methods', it's an endpoint
 
+                crud_methods = ["create", "read", "update", "delete"]
+
                 # For each defined method, add an TinApiMethod as
                 # an attribute in the current TinApiClass instance
                 for mth, mth_data in cls_data["methods"].items():
@@ -93,17 +95,33 @@ class TinApi(TinApiClass):
                     # If there is an associated model, it will get ome of the same
                     # methods as the parent class
                     if hasattr(new_type, "_model") and new_type._model is not None:
-                        # Only add methods to the object model that are explicitly
-                        # labeled as object CRUD methods
-                        if "object_method" in mth_data:
-                            crud_method = mth_data["object_method"].lower()
-                            if crud_method in new_obj.model.API_METHODS:
-                                new_obj.model.API_METHODS[crud_method] = new_method
+                        if mth_data.get("model_method_add", None) is False:
+                            continue
+
+                        if (
+                            mth_data.get("model_method_add", None) is True
+                            or cls_data.get("model_methods_add_all", None) is True
+                        ):
+                            method_name = mth_data.get("model_method_name") or mth
+                            new_obj.model.add_method(method_name, new_method)
+
+                            if "crud_label" in mth_data:
+                                crud_method = mth_data["crud_label"].lower()
+                                if crud_method in crud_methods:
+                                    new_obj.model.CRUD_METHODS[
+                                        crud_method
+                                    ] = new_obj.model.get_method(method_name)
+
+                                    # There can be only one method assigned to each CRUD
+                                    # action. As we assign them, remove them from the
+                                    # list. If a second/duplicate label shows up in the
+                                    # config, it'll just be ignored for not being in
+                                    # crud_methods
+                                    crud_methods.remove(crud_method)
 
             else:
                 # If there are no methods, it's a container class
                 self._recurse_build_method_path(new_obj, cls_data, container_path)
-
 
     @property
     def request(self):
@@ -171,7 +189,7 @@ class TinApiMethod(TinApiBase):
         self._response_factory = TinApiResponseFactory()
 
         self.method = self._method_data["method"]
-        self.object_method = self._method_data.get("object_method", None)
+        self.crud_label = self._method_data.get("crud_label", None)
         self.singleton = self._method_data.get("singleton", False)
 
         if self._method_data.get("nobase", False):

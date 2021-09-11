@@ -63,7 +63,7 @@ class TinApiClass(TinApiBase):
 
     def _recurse(self, obj, toplevel=True, strings=False):
         """Recurses through defined classes and methods and
-           builds a dict of their names"""
+        builds a dict of their names"""
         layer = {"classes": {}, "methods": [], "model": None}
 
         for mth in obj.methods():
@@ -83,7 +83,7 @@ class TinApiClass(TinApiBase):
 
     def tree(self, strings=False):
         """Returns an informational dict of the object/method hierarchy,
-           as name strings"""
+        as name strings"""
         return self._recurse(self, True, strings)
 
     def to_json(self):

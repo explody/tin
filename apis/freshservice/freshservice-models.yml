@@ -1,7 +1,7 @@
 ---
 agent:
   id_attr: id
-  read:
+  read_only:
     - id
   must:
     - first_name
@@ -30,7 +30,7 @@ agent:
     - custom_fields
 requester:
   id_attr: id
-  read:
+  read_only:
     - id
     - has_logged_in
     - created_at
@@ -59,7 +59,7 @@ requester:
     - custom_fields
 department:
   id_attr: id
-  read:
+  read_only:
     - id
   must:
     - name

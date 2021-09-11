@@ -2,30 +2,33 @@
 agents:
   list_data_key: "agents"
   model: agent
+  model_methods_add_all: true
   methods:
     create:
       method: POST
       path: /agents
-      object_method: create
+      crud_label: create
       expect: 201
+      model_method_name: create
+      model_method_add: true
     get:
       method: GET
       path: /agents/:id
-      object_method: read
+      crud_label: read
     list:
       method: GET
       path: /agents
     update:
       method: PUT
       path: /agents/:id
-      object_method: update
+      crud_label: update
     deactivate:
       method: DELETE
       path: /agents/:id
     forget:
       method: DELETE
       path: /agents/:id/forget
-      object_method: delete
+      crud_label: delete
     reactivate:
       method: PUT
       path: /agents/:id/reactivate
@@ -42,26 +45,26 @@ requesters:
     create:
       method: POST
       path: /requesters
-      object_method: create
+      crud_label: create
       expect: 201
     get:
       method: GET
       path: /requesters/:id
-      object_method: read
+      crud_label: read
     list:
       method: GET
       path: /requesters
     update:
       method: PUT
       path: /requesters/:id
-      object_method: update
+      crud_label: update
     deactivate:
       method: DELETE
       path: /requesters/:id
     forget:
       method: DELETE
       path: /requesters/:id/forget
-      object_method: delete
+      crud_label: delete
     reactivate:
       method: PUT
       path: /requesters/:id/reactivate
@@ -80,19 +83,19 @@ groups:
     create:
       method: POST
       path: /groups
-      object_method: create
+      crud_label: create
       expect: 201
     get:
       method: GET
       path: /groups/:id
-      object_method: read
+      crud_label: read
     list:
       method: GET
       path: /groups
     update:
       method: PUT
       path: /groups/:id
-      object_method: update
+      crud_label: update
     delete:
       method: DELETE
       path: /groups/:id
@@ -113,19 +116,19 @@ departments:
     create:
       method: POST
       path: /departments
-      object_method: create
+      crud_label: create
       expect: 200   # what?! but yes, 200
     get:
       method: GET
       path: /departments/:id
-      object_method: read
+      crud_label: read
     list:
       method: GET
       path: /departments
     update:
       method: PUT
       path: /departments/:id
-      object_method: update
+      crud_label: update
     delete:
       method: DELETE
       path: /departments/:id
@@ -160,19 +163,19 @@ solutions:
         method: GET
         path: /solutions/categories/:id
         singleton: true
-        object_method: read
+        crud_label: read
       create:
         method: POST
         path: /solutions/categories
-        object_method: create
+        crud_label: create
       update:
         method: PUT
         path: /solutions/categories/:id
-        object_method: update
+        crud_label: update
       delete:
         method: PUT
         path: /solutions/categories/:id
-        object_method: delete
+        crud_label: delete
         expect: 204
   folders:
     model: folder

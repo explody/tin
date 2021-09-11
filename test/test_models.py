@@ -76,6 +76,27 @@ def test_other_id_attr():
     assert instance.id == '639b410e70fe'
 
 
+def test_add_all_methods():
+    testservice = api_inst()
+    assert testservice.container.subcontainer.model.method_names() == [
+        'list', 'get', 'create', 'update', 'delete'
+    ]
+
+
+def test_add_some_methods():
+    testservice = api_inst()
+    assert testservice.container.subcontainer2.model.method_names() == [
+        'update'
+    ]
+
+
+def test_exclude_some_methods():
+    testservice = api_inst()
+    assert testservice.container.subcontainer3.model.method_names() == [
+        'get'
+    ]
+
+
 def test_misconfigured_singleton(httpserver: HTTPServer):
     httpserver.expect_request(
         "/api/stuff/whatnot", json={"send": "this"}, method="POST"
@@ -290,7 +311,7 @@ def test_model_delete(httpserver: HTTPServer):
     assert instance.delete() is None
 
 
-def test_model_refresh(httpserver: HTTPServer):
+def test_model_read(httpserver: HTTPServer):
     httpserver.expect_ordered_request("/api/stuff/whatnot/1", method="GET").respond_with_json(
         {"id": 1, "name": "original name", "description": "original description"}
     )
@@ -306,9 +327,10 @@ def test_model_refresh(httpserver: HTTPServer):
     )
     testservice = api_inst()
     instance = testservice.container.subcontainer.get(1)
+
     instance.description = "updated description"
     instance.name = "updated name"
-    instance.refresh()
+    instance.read()
 
     assert instance.description == "refreshed description"
     assert instance.name == "refreshed name"

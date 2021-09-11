@@ -20,7 +20,7 @@ hasmethods:
       method:   PUT
       path:     /things/:id
       expect:   200
-      object_method: update
+      crud_label: update
       default_tokens:
         otherthing: changedstuff
     delete:
@@ -35,6 +35,7 @@ container:
     model: mymodel
     list_data_key: "mymodels"
     singleton_data_key: "mymodel"
+    model_methods_add_all: true
     methods:
       list:
         method: GET
@@ -44,24 +45,25 @@ container:
         method: GET
         path: /stuff/whatnot/:id
         return: singleton
-        object_method: read
+        crud_label: read
       create:
         method: POST
         path: /stuff/whatnot
-        object_method: create
+        crud_label: create
         return: singleton
       update:
         method: PUT
         path: /stuff/whatnot/:id
-        object_method: update
+        crud_label: update
         return: singleton
       delete:
         method: DELETE
         path: /stuff/whatnot/:id
-        object_method: delete
+        crud_label: delete
         expect: 204
   subcontainer2:
     model: mymodel_otherid
+    model_methods_add_all: false
     methods:
       list:
         method: GET
@@ -75,14 +77,21 @@ container:
       update:
         method: PUT
         path: /stuff/folders/:id
+        model_method_add: true
       delete:
         method: PUT
         path: /stuff/folders/:id
-    subcontainer3:
-      methods:
-        list:
-          method: GET
-          path: /obscurepath/items
+  subcontainer3:
+    model: mymodel
+    model_methods_add_all: true
+    methods:
+      list:
+        method: GET
+        path: /obscurepath/items
+        model_method_add: false
+      get:
+        method: GET
+        path: /stuff/folders/:id
   nomodel:
     methods:
       list:

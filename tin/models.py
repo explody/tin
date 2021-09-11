@@ -3,16 +3,16 @@ from tin.exceptions import TinModelError, TinError
 from deepmerge import always_merger
 import simplejson as json
 
-DEFAULT_API_METHODS = {"create": None, "read": None, "update": None, "delete": None}
-DEFAULT_ID_ATTR = 'id'
+CRUD_METHODS = {"create": None, "read": None, "update": None, "delete": None}
+DEFAULT_ID_ATTR = "id"
 
 
 class TinApiModelFactory(object):
-
     def __call__(self, name, data):
         new_model_type = type(name, (TinApiModel,), data)
-        new_model_type.API_METHODS = dict(DEFAULT_API_METHODS)
-        new_model_type.id_attr = data.get('id_attr', False) or str(DEFAULT_ID_ATTR)
+        new_model_type.API_METHODS = dict()
+        new_model_type.CRUD_METHODS = dict(CRUD_METHODS)
+        new_model_type.id_attr = data.get("id_attr", False) or str(DEFAULT_ID_ATTR)
 
         return new_model_type
 
@@ -51,9 +51,6 @@ class TinApiModel(TinApiBase):
             else:
                 self.method_missing(item)
 
-    def add_method(self, name, method):
-        self.API_METHODS[name] = method
-
     def method_missing(self, method_name, *args, **kwargs):
         e = "type object '%s' has no attribute '%s'" % (
             self.__class__.__name__,
@@ -61,8 +58,13 @@ class TinApiModel(TinApiBase):
         )
         raise AttributeError(e)
 
-    def api_method(self, crud_action):
-        return self.API_METHODS.get(crud_action, None)
+    def api_method(self, name):
+        return self.API_METHODS.get(name, None)
+
+    def crud_method(self, action):
+        return (
+            self.API_METHODS.get(action, None) if action in self.CRUD_METHODS else None
+        )
 
     def validate(self, data):
         for required_attr in self.must:
@@ -73,8 +75,8 @@ class TinApiModel(TinApiBase):
 
     def clean(self, data):
         clean_data = dict(data)
-        if hasattr(self, "read"):
-            for ro_attr in self.read:
+        if hasattr(self, "read_only"):
+            for ro_attr in self.read_only:
                 clean_data.pop(ro_attr, None)
         return clean_data
 
@@ -114,10 +116,14 @@ class TinApiModel(TinApiBase):
         if "id" in data:
             data.pop("id")
 
-        self._data = self.API_METHODS["create"](data=data, nomodel=True, **kwargs)
+        self._data = self.CRUD_METHODS["create"](
+            data=data, nomodel=True, **kwargs
+        )
 
-    def refresh(self, **kwargs):
-        self._data = self.API_METHODS["read"](id=self.id, nomodel=True, **kwargs)
+    def read(self, **kwargs):
+        self._data = self.CRUD_METHODS["read"](
+            id=self.id, nomodel=True, **kwargs
+        )
 
     def update(self, data, **kwargs):
         # Don't accept an id in kwargs here, is should be in _data
@@ -125,13 +131,13 @@ class TinApiModel(TinApiBase):
             kwargs.pop("id")
 
         self._confirm_i_have_id("update")
-        self._data = self.API_METHODS["update"](
+        self._data = self.CRUD_METHODS["update"](
             id=self.id, data=data, nomodel=True, **kwargs
         )
 
     def delete(self):
         self._confirm_i_have_id("delete")
-        self.API_METHODS["delete"](self.id)
+        self.CRUD_METHODS["delete"](self.id)
         self._data = None
         return self._data
 
@@ -175,3 +181,19 @@ class TinApiModel(TinApiBase):
 
     def to_dict(self):
         return self._data
+
+    @classmethod
+    def method_names(cls):
+        return [k for k,v in cls.API_METHODS.items()]
+
+    @classmethod
+    def methods(cls):
+        return [v for k,v in cls.API_METHODS.items()]
+
+    @classmethod
+    def add_method(cls, name, method):
+        cls.API_METHODS[name] = method
+
+    @classmethod
+    def get_method(cls, name):
+        return cls.API_METHODS[name]

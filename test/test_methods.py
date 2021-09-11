@@ -35,7 +35,7 @@ def test_available_environments(env):
     stringtree = testservice.tree(True)
     assert len(stringtree) == 1
     assert len(stringtree["testservice"]["classes"]["hasmethods"]["methods"]) == 5
-    assert len(stringtree["testservice"]["classes"]["container"]["classes"]) == 3
+    assert len(stringtree["testservice"]["classes"]["container"]["classes"]) == 4
     assert (
         len(
             stringtree["testservice"]["classes"]["container"]["classes"][
@@ -96,7 +96,7 @@ def test_to_json():
     assert type(from_json["method_data"]) is dict
     assert type(from_json["method_data"]["default_tokens"]) is dict
 
-    for key in ["method", "path", "object_method"]:
+    for key in ["method", "path", "crud_label"]:
         assert key in from_json["method_data"]
         assert type(from_json["method_data"][key]) is str
 

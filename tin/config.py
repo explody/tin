@@ -58,9 +58,7 @@ class TinConfig(object):
             raise TinError("Invalid config (empty?)")
 
         if environment not in conf.get("environments", {}):
-            raise TinError(
-                "No such environment is configured: {}".format(environment)
-            )
+            raise TinError("No such environment is configured: {}".format(environment))
 
         self._api_attrs = conf.get("common", {})
         self.headers = {
