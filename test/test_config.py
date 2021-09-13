@@ -168,27 +168,27 @@ def test_no_config():
         TinConfig(None, None)
 
 
-def test_no_environment():
+def test_file_but_no_environment():
     with pytest.raises(TinError):
         TinConfig("test/data/api/testservice.yml", None)
 
 
-def test_bad_config():
+def test_file_bad_config():
     with pytest.raises(TinConfigNotFound):
         TinConfig("nosuchfile.yml", "fake")
 
 
-def test_empty_config():
+def test_file_empty_config():
     with pytest.raises(TinError):
         TinConfig("test/data/api/empty.yml", "fake")
 
 
-def test_bad_environment():
+def test_file_bad_environment():
     with pytest.raises(TinError):
         TinConfig("test/data/api/testservice.yml", "nosuchenv")
 
 
-def test_no_models():
+def test_file_no_models():
     ac = TinConfig("test/data/api/testservice.yml", "no_models")
     assert ac.models == {}
 
@@ -197,7 +197,7 @@ def test_no_models():
 class TestConfig:
     def test_config_files(self, config):
 
-        assert config.config_file in [
+        assert config.config_src in [
             os.path.abspath("test/data/api/testservice.yml"),
             os.path.abspath("test/data/api/testservice.json"),
         ]

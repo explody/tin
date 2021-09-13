@@ -80,8 +80,9 @@ class TinConfig(object):
 
     def __init__(self, config_file=None, environment=None):
 
-        self.config_src = None
         self.api_name = None
+        self.config_src = None
+        self.config_dir = None
         self.config_data = None
         self.environment = None
 
@@ -102,7 +103,7 @@ class TinConfig(object):
             if "TIN_CONFIG" in os.environ:
                 config = os.environ.get("TIN_CONFIG")
                 if os.path.isfile(config):
-                    config_data = self._load_config_from_file(config, True)
+                    config_data = self._load_main_config_from_file(config)
                 else:
                     try:
                         config_data = self._load_json_or_yaml(config)
@@ -115,9 +116,7 @@ class TinConfig(object):
                 config_data = {}
                 self.config_src = 'ENV'
         else:
-            # meh, DRY
-            config_data = self._load_config_from_file(config_file, True)
-            self.config_dir = os.path.dirname(os.path.abspath(config_file))
+            config_data = self._load_main_config_from_file(config_file)
 
         logger.info(
             "Using config: {} Environment: {}".format(self.config_src, self.environment if self.environment else 'default (none)')
@@ -128,10 +127,17 @@ class TinConfig(object):
         # Update from env vars as described above
         self.config_data = self._update_from_env(config_data, environment)
 
-        # If an environment was specifid but we still don't have environment data, it's
+        if not self.config_data:
+            raise TinError("Empty config!")
+
+        # If we have an an environment based config, but no environment OR
+        # an environment was specifid but we still don't have environment data, it's
         # a problem
-        if environment and environment not in self.config_data.get("environments", {}):
-            raise TinError("Environment set but not found in config: {}".format(environment))
+        if self.environment is None and "environments" in self.config_data:
+            raise TinError("I have an environment-based config"
+                           "but environment is None")
+        elif self.environment is not None and self.environment not in self.config_data.get("environments", {}):
+            raise TinError("Environment set but not found in config: {}".format(self.environment))
 
         if self.config_data.get('api_name', None):
             self.api_name = self.config_data['api_name']
@@ -140,7 +146,7 @@ class TinConfig(object):
         elif os.path.isfile(self.config_src):
             self.api_name = os.path.splitext(os.path.basename(self.config_src))[0]
         else:
-            TinError("""Cannot determine the API name  Either set TIN__API_NAME env
+            TinError("""Cannot determine the API name Either set TIN__API_NAME env
                         var or set 'api_name' in the common settings.""")
 
         if self.environment:
@@ -183,10 +189,7 @@ class TinConfig(object):
             self.headers.update(self._api_config["headers"])
 
         # Set toplevel keys in the yaml as attributes on this object
-        print("HERE ###################", self.environment)
-        pprint.pp(self._api_config)
         for k, v in self._api_config.items():
-            print('SETTING', k)
             setattr(self, k, v)
 
         ######################
@@ -232,8 +235,8 @@ class TinConfig(object):
 
         return config_data
 
-    def _load_config_from_file(self, filename, set_config_dir=False):
-        """Load configuration from a file.
+    def _load_config_from_file(self, filename):
+        """Load an arbitrary configuration from a file.
 
         Update config_src and api_name.
 
@@ -243,10 +246,25 @@ class TinConfig(object):
         Returns:
             see _loadfile()
         """
+
+        return self._loadfile(self.find_config(filename))
+
+
+    def _load_main_config_from_file(self, filename):
+        """Load main configuration from a file.
+
+        Update config_src and config_dir.
+
+        Arguments:
+            filename (str): Relative or absolute path to a file
+
+        Returns:
+            see _loadfile()
+        """
         self.config_src = self.find_config(filename)
-        if set_config_dir:
-            self.config_dir = os.path.dirname(os.path.abspath(filename))
-        return self._loadfile(self.config_src)
+        self.config_dir = os.path.dirname(os.path.abspath(filename))
+        return self._load_config_from_file(self.config_src)
+
 
     def _loadfile(self, filepath):
         """Parses the conf file as YAML or JSON based on file extension
