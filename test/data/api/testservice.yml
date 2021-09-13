@@ -3,84 +3,84 @@ environments:
     host: localhost
     scheme: http
     port: 5000
-    credfile: credfile.yml
-    authtype: basic
+    credentials: credentials.yml
+    auth_type: basic
     ssl:
       verify: true
-    apifile: testservice-api.yml
-    modelfile: testservice-models.yml
+    api_file: testservice-api.yml
+    model_file: testservice-models.yml
   param:
     host: localhost
     scheme: http
     port: 5000
-    credfile: credfile.yml
-    authtype: param
+    credentials: credentials.yml
+    auth_type: param
     ssl:
       verify: true
-    apifile: testservice-api.yml
-    modelfile: testservice-models.yml
+    api_file: testservice-api.yml
+    model_file: testservice-models.yml
   header:
     host: localhost
     scheme: http
     port: 5000
-    credfile: credfile.yml
-    authtype: header
+    credentials: credentials.yml
+    auth_type: header
     ssl:
       verify: true
-    apifile: testservice-api.yml
-    modelfile: testservice-models.yml
+    api_file: testservice-api.yml
+    model_file: testservice-models.yml
   no_auth:
     host: localhost
     scheme: http
     port: 5000
-    credfile: credfile.yml
-    authtype: none
+    credentials: credentials.yml
+    auth_type: none
     ssl:
       verify: true
-    apifile: testservice-api.yml
-    modelfile: testservice-models.yml
+    api_file: testservice-api.yml
+    model_file: testservice-models.yml
   no_models:
     host: localhost
     scheme: http
     port: 5000
-    credfile: credfile.yml
-    authtype: basic
+    credentials: credentials.yml
+    auth_type: basic
     ssl:
       verify: true
-    apifile: testservice-api.yml
+    api_file: testservice-api.yml
   use_session:
     host: localhost
     scheme: http
     port: 5000
-    credfile: credfile.yml
-    authtype: basic
+    credentials: credentials.yml
+    auth_type: basic
     use_session: true
     ssl:
       verify: true
-    apifile: testservice-api.yml
-    modelfile: testservice-models.yml
+    api_file: testservice-api.yml
+    model_file: testservice-models.yml
   no_session:
     host: localhost
     scheme: http
     port: 5000
-    credfile: credfile.yml
-    authtype: basic
+    credentials: credentials.yml
+    auth_type: basic
     use_session: false
     ssl:
       verify: true
-    apifile: testservice-api.yml
-    modelfile: testservice-models.yml
+    api_file: testservice-api.yml
+    model_file: testservice-models.yml
   no_headers:
     host: localhost
     scheme: http
     port: 5000
-    credfile: credfile.yml
-    authtype: basic
+    credentials: credentials.yml
+    auth_type: basic
     use_session: false
     ssl:
       verify: true
-    apifile: testservice-api.yml
-    modelfile: testservice-models.yml
+    api_file: testservice-api.yml
+    model_file: testservice-models.yml
     headers: {}
 
 # Common settings apply to all environments

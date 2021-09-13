@@ -1,0 +1,17 @@
+host: localhost
+scheme: http
+port: 5000
+credentials: credentials.yml
+auth_type: basic
+ssl:
+  verify: true
+api_file: testservice-api.yml
+model_file: testservice-models.yml
+content-type: "application/json"
+basepath: "/api"
+headers:
+  someheader: somevalue
+default_params:
+  thing: stuff
+default_tokens:
+  otherthing: morestuff

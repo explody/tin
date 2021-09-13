@@ -4,12 +4,12 @@ environments:
     host: yourhost.com
     scheme: https
     port: 443
-    credfile: ~/.tin/apis/kace/production.yml
-    authtype: none
+    credentials: ~/.tin/apis/kace/production.yml
+    auth_type: none
     use_session: true
     ssl:
       verify: true
-    apifile: kace-api.yml
+    api_file: kace-api.yml
 common:
   # Common settings apply to all environments
   type: "application/json"

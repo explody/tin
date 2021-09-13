@@ -149,14 +149,14 @@ class TinApi(TinApiClass):
     def _default_auth(self):
         """Returns a requests auth instance based on the api config"""
 
-        if self.conf.authtype == "basic":
+        if self.conf.auth_type == "basic":
             return requests.auth.HTTPBasicAuth(
                 self.conf.credentials.get("username", None),
                 self.conf.credentials.get("password", None),
             )
-        elif self.conf.authtype == "header":
+        elif self.conf.auth_type == "header":
             return HTTPGenericHeaderAuth(self.conf.credentials)
-        elif self.conf.authtype == "param":
+        elif self.conf.auth_type == "param":
             return HTTPGenericParameterAuth(self.conf.credentials)
         else:
             return None

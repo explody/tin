@@ -4,12 +4,12 @@ environments:
     host: yourhost.freshservice.com
     scheme: https
     port: 443
-    credfile: ~/.tin/apis/freshservice/production.yml
-    authtype: basic
+    credentials: ~/.tin/apis/freshservice/production.yml
+    auth_type: basic
     ssl:
       verify: true
-    apifile: freshservice-api.yml
-    modelfile: freshservice-models.yml
+    api_file: freshservice-api.yml
+    model_file: freshservice-models.yml
 common:
   # Common settings apply to all environments
   type: "application/json"
