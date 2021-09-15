@@ -39,15 +39,15 @@ environments:
     host: yourhost.service.com
     scheme: https
     port: 443
-    credfile: ~/path/to/credentials.yml
-    authtype: basic
+    credentials: ~/path/to/credentials.yml
+    auth_type: basic
     ssl:
       verify: true
-    apifile: path/to/service-api.yml
-    modelfile: path/to/service-models.yml
+    api_file: path/to/service-api.yml
+    model_file: path/to/service-models.yml
 common:
   # Common settings apply to all environments
-  type: "application/json"
+  content_type: "application/json"
   basepath: "/api/v2"
   params:
     may: ["links", "filter_by", "filter_value"]
