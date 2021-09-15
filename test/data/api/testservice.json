@@ -4,52 +4,52 @@
       "host": "localhost",
       "scheme": "http",
       "port": 5000,
-      "credfile": "credfile.yml",
-      "authtype": "basic",
+      "credentials": "credentials.yml",
+      "auth_type": "basic",
       "ssl": {
         "verify": true
       },
-      "apifile": "testservice-api.yml",
-      "modelfile": "testservice-models.yml"
+      "api_file": "testservice-api.yml",
+      "model_file": "testservice-models.yml"
     },
     "param": {
       "host": "localhost",
       "scheme": "http",
       "port": 5000,
-      "credfile": "credfile.yml",
-      "authtype": "basic",
+      "credentials": "credentials.yml",
+      "auth_type": "basic",
       "ssl": {
         "verify": true
       },
-      "apifile": "testservice-api.yml",
-      "modelfile": "testservice-models.yml"
+      "api_file": "testservice-api.yml",
+      "model_file": "testservice-models.yml"
     },
     "header": {
       "host": "localhost",
       "scheme": "http",
       "port": 5000,
-      "credfile": "credfile.yml",
-      "authtype": "basic",
+      "credentials": "credentials.yml",
+      "auth_type": "basic",
       "ssl": {
         "verify": true
       },
-      "apifile": "testservice-api.yml",
-      "modelfile": "testservice-models.yml"
+      "api_file": "testservice-api.yml",
+      "model_file": "testservice-models.yml"
     },
     "no_models": {
       "host": "localhost",
       "scheme": "http",
       "port": 5000,
-      "credfile": "credfile.yml",
-      "authtype": "basic",
+      "credentials": "credentials.yml",
+      "auth_type": "basic",
       "ssl": {
         "verify": true
       },
-      "apifile": "testservice-api.yml"
+      "api_file": "testservice-api.yml"
     }
   },
   "common": {
-    "type": "application/json",
+    "content_type": "application/json",
     "basepath": "/api",
     "headers": {
       "someheader": "somevalue"

@@ -6,20 +6,19 @@ import yaml
 from deepmerge import always_merger
 from tin.exceptions import TinConfigNotFound, TinError
 
-import pprint
-import sys
+
+# We only do JSON APIs right now
+DEFAULT_CONTENT_TYPE = "application/json"
 
 DEFAULTS = {
     "scheme": "https",
     "port": 443,
     "use_session": True,
-    "ssl": {
-        "verify": True
-    }
+    "ssl": {"verify": True},
+    "content_type": DEFAULT_CONTENT_TYPE
 }
 
-# We only do JSON APIs right now
-DEFAULT_CONTENT_TYPE = "application/json"
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -58,8 +57,8 @@ class TinConfig(object):
 
     Aftr config data is loaded, environment variables will be loaded, which will override config file values if set.
 
-    For multi-environment configs, the first key is the environment name. Note the double underscores.
-    TIN__BASIC__HOST corresponds to config_data['environments']['basic']['host']
+    For multi-environment configs, the first key must always be 'ENVIRONMENTS'. Note the double underscores.
+    TIN__ENVIRONMENTS__BASIC__HOST corresponds to config_data['environments']['basic']['host']
 
     Common vars are similar
 
@@ -86,6 +85,8 @@ class TinConfig(object):
         self.config_data = None
         self.environment = None
 
+        self._api_config = dict(DEFAULTS)
+
         # Environment is required regardless of where config data comes from
         if environment is None:
             if "TIN_ENV" in os.environ:
@@ -111,15 +112,18 @@ class TinConfig(object):
                         # Don't die here, as we might load config from individual env
                         # vars
                         config_data = {}
-                    self.config_src = 'ENV'
+                    self.config_src = "ENV"
             else:
                 config_data = {}
-                self.config_src = 'ENV'
+                self.config_src = "ENV"
         else:
             config_data = self._load_main_config_from_file(config_file)
 
         logger.info(
-            "Using config: {} Environment: {}".format(self.config_src, self.environment if self.environment else 'default (none)')
+            "Using config: {} Environment: {}".format(
+                self.config_src,
+                self.environment if self.environment else "default (none)",
+            )
         )
 
         ######################
@@ -131,76 +135,113 @@ class TinConfig(object):
             raise TinError("Empty config!")
 
         # If we have an an environment based config, but no environment OR
-        # an environment was specifid but we still don't have environment data, it's
+        # an environment was specified but we still don't have environment data, it's
         # a problem
         if self.environment is None and "environments" in self.config_data:
-            raise TinError("I have an environment-based config"
-                           "but environment is None")
-        elif self.environment is not None and self.environment not in self.config_data.get("environments", {}):
-            raise TinError("Environment set but not found in config: {}".format(self.environment))
+            raise TinError("I have an environment-based config but environment is None")
+        elif (
+            self.environment is not None
+            and self.environment not in self.config_data.get("environments", {})
+        ):
+            raise TinError(
+                "Environment set but not found in config: {}".format(self.environment)
+            )
 
-        if self.config_data.get('api_name', None):
-            self.api_name = self.config_data['api_name']
-        elif self.config_data.get('common', {}).get('api_name', None):
-            self.api_name = self.config_data['common']['api_name']
+        ######################
+        # Determine API name for type naming
+        if self.config_data.get("api_name", None):
+            self.api_name = self.config_data["api_name"]
+        elif self.config_data.get("common", {}).get("api_name", None):
+            self.api_name = self.config_data["common"]["api_name"]
         elif os.path.isfile(self.config_src):
             self.api_name = os.path.splitext(os.path.basename(self.config_src))[0]
         else:
-            TinError("""Cannot determine the API name Either set TIN__API_NAME env
-                        var or set 'api_name' in the common settings.""")
-
-        if self.environment:
-            # Merge common env config into global defaults
-            self._api_config = always_merger.merge(
-                DEFAULTS,
-                self.config_data.get("common", {})
+            raise TinError(
+                """Cannot determine the API name! Either set TIN__API_NAME env
+                        var or set 'api_name' in the common settings."""
             )
-            # Now merge env-specific settings into that
+
+        ######################
+        # Build the final _api_config
+        if self.environment:
+            # Merge common env config into _api_config
             self._api_config = always_merger.merge(
-                self._api_config,
-                self.config_data["environments"][self.environment]
+                self._api_config, self.config_data.get("common", {})
+            )
+
+            # Now merge env-specific settings into that result
+            self._api_config = always_merger.merge(
+                self._api_config, self.config_data["environments"][self.environment]
             )
         else:
             # If there's no environment, all the config keys should already be top-level
-            self._api_config = self.config_data
+            self._api_config = always_merger.merge(
+                self._api_config, self.config_data
+            )
+
+        # At this point, we must have an api_file or there's no point in continuing
+        if self._api_config.get("api_file", None) is None:
+            raise TinError("No api_file specified in the config. Cannot continue.")
+
+        ######################
+        # Determine a config_dir, if any
+        if 'config_dir' not in self._api_config and self.config_src != 'ENV':
+            # If config_dir is in the api_config, it will be accessible via
+            # self.config_dir already due to __getattr__. If not, set it based on
+            # the main config path *IF* there is one
+            self._api_config['config_dir'] = os.path.dirname(
+                os.path.abspath(self.config_src)
+            )
+            self.config_dir = self._api_config['config_dir']
+        elif 'config_dir' in self._api_config:
+            self.config_dir = self._api_config['config_dir']
+
 
         ######################
         # Credentials
-        if self.config_data.get('auth_type') in [None, 'none']:
+        if self._api_config.get("auth_type") in [None, "none"]:
             self.credentials = None
-        elif os.path.isfile(self.config_data.get('credentials', '/')):
-            self.credentials = self._loadfile(self.find_config(self.config_data['credentials']))
         else:
             try:
-                self.credentials = self._load_json_or_yaml(self.config_data['credentials'])
+                self.credentials = self._load_config_from_file(
+                    self._api_config["credentials"]
+                )
+            except TinConfigNotFound:
+                self.credentials = self._load_json_or_yaml(
+                    self._api_config["credentials"]
+                )
             except ValueError:
                 # doesn't load as json or yaml, may be a custom string
-                self.credentials = self.config_data['credentials']
+                self.credentials = self._api_config["credentials"]
 
         ######################
         # Headers
         self.headers = {
-            "Content-type": self._api_config.get("content_type", False) or DEFAULT_CONTENT_TYPE,
-            "Accept": self._api_config.get("content_type", False) or DEFAULT_CONTENT_TYPE,
+            "Content-type": self._api_config.get("content_type", False)
+            or DEFAULT_CONTENT_TYPE,
+            "Accept": self._api_config.get("content_type", False)
+            or DEFAULT_CONTENT_TYPE,
         }
 
         # Merge in any headers from the config
-        if "headers" in self._api_config:
+        if self._api_config.get("headers", None) is not None:
             self.headers.update(self._api_config["headers"])
 
-        # Set toplevel keys in the yaml as attributes on this object
-        for k, v in self._api_config.items():
-            setattr(self, k, v)
+        ######################
+        # Minor data checks
+        try:
+            self._api_config['port'] = int(self._api_config['port'])
+        except ValueError:
+            raise TinError("Invalid port, must be an integer")
 
         ######################
         # Additional file-based configs
         # API and Model configs must be files
         self.apidata = self._load_config_from_file(self.api_file)
 
-        if "model_file" in self._api_config:
-            self.models = self._load_config_from_file(self.model_file)
-        else:
-            self.models = {}
+        self.models = self._load_config_from_file(
+            self._api_config.get("model_file", None)
+        ) if 'model_file' in self._api_config else {}
 
     def _update_from_env(self, config_data, environment=None):
         """Read configuration from environment variables
@@ -219,13 +260,13 @@ class TinConfig(object):
             see _loadfile()
         """
         for var, val in os.environ.items():
-            if var.startswith('TIN__{}'.format(environment if environment else '')):
-                env_parts = [v.lower() for v in var.split('__')[1:]]
+            if var.startswith("TIN__{}".format(environment if environment else "")):
+                env_parts = [v.lower() for v in var.split("__")[1:]]
                 dict_from_list = current = {}
                 # Some confusing iteration that turns a list into nested dict keys
                 for i in range(0, len(env_parts)):
                     part = env_parts[i]
-                    if i == len(env_parts)-1:
+                    if i == len(env_parts) - 1:
                         current[part] = val
                     else:
                         current[part] = {}
@@ -234,6 +275,37 @@ class TinConfig(object):
                 config_data = always_merger.merge(config_data, dict_from_list)
 
         return config_data
+
+    def __getattr__(self, item):
+        """Look up referenced attrs in _api_config before __dict__
+
+        Arguments:
+            item (str): attr or method name
+
+        Returns:
+            Value of the attribute key
+        """
+        if item in self._api_config:
+            return self._api_config[item]
+        elif item in self.__dict__:
+            return self.__dict__[item]
+        else:
+            self.method_missing(item)
+
+    def method_missing(self, method_name, *args, **kwargs):
+        """Handle references to missing attrs
+
+        Arguments:
+            method_name (str): Name of referenced attr
+
+        Raises:
+            AttributeError
+        """
+        e = "type object '%s' has no attribute '%s'" % (
+            self.__class__.__name__,
+            method_name,
+        )
+        raise AttributeError(e)
 
     def _load_config_from_file(self, filename):
         """Load an arbitrary configuration from a file.
@@ -246,14 +318,12 @@ class TinConfig(object):
         Returns:
             see _loadfile()
         """
-
         return self._loadfile(self.find_config(filename))
-
 
     def _load_main_config_from_file(self, filename):
         """Load main configuration from a file.
 
-        Update config_src and config_dir.
+        Update config_src.
 
         Arguments:
             filename (str): Relative or absolute path to a file
@@ -262,9 +332,7 @@ class TinConfig(object):
             see _loadfile()
         """
         self.config_src = self.find_config(filename)
-        self.config_dir = os.path.dirname(os.path.abspath(filename))
         return self._load_config_from_file(self.config_src)
-
 
     def _loadfile(self, filepath):
         """Parses the conf file as YAML or JSON based on file extension
@@ -280,7 +348,6 @@ class TinConfig(object):
                 return yaml.safe_load(fh.read())
             elif filepath.endswith(".json"):
                 return json.loads(fh.read())
-
 
     def _load_json_or_yaml(self, data):
         """Given a chunk of data, attempts to load it as JSON or YAML, in that order
@@ -300,7 +367,6 @@ class TinConfig(object):
 
         return loaded
 
-
     def set(self, key, value):
         """Config attribute setter
 
@@ -309,7 +375,7 @@ class TinConfig(object):
             value (str): Value to set. Presumed to be a string but this isn't enforced.
         """
 
-        setattr(self, key, value)
+        self._api_config[key] = value
 
     def get(self, key):
         """Config attribute getter
@@ -338,12 +404,12 @@ class TinConfig(object):
         if os.path.isabs(filename):
             return filename
         else:
-            if getattr(self, "config_dir", None):
-                file_in_config_dir = os.path.join(self.config_dir, filename)
-                if os.path.isfile(file_in_config_dir):
-                    return os.path.abspath(file_in_config_dir)
-
-            if os.path.isfile(filename):
+            if self.config_dir is not None:
+                # self.config_dir is either None or an abspath already
+                filename = os.path.join(self.config_dir, filename)
+                if os.path.isfile(filename):
+                    return filename
+            elif os.path.isfile(filename):
                 return os.path.abspath(filename)
 
         raise TinConfigNotFound(filename)

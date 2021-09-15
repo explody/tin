@@ -81,11 +81,30 @@ environments:
       verify: true
     api_file: testservice-api.yml
     model_file: testservice-models.yml
-    headers: {}
+    headers: null
+# generate exceptions
+  no_api_file:
+    host: localhost
+    scheme: http
+    port: 5000
+    credentials: credentials.yml
+    auth_type: basic
+    ssl:
+      verify: true
+  bad_port:
+    host: localhost
+    scheme: http
+    port: not-a-number
+    credentials: credentials.yml
+    auth_type: basic
+    ssl:
+      verify: true
+    api_file: testservice-api.yml
+    model_file: testservice-models.yml
 
 # Common settings apply to all environments
 common:
-  type: "application/json"
+  content_type: "application/json"
   basepath: "/api"
   headers:
     someheader: somevalue
