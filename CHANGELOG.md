@@ -1,3 +1,14 @@
+## [1.1.2](https://gitlab.com/explody/tin/compare/v1.1.1...v1.1.2) (2021-09-15)
+
+
+### Doc
+
+* update readme ([657718a](https://gitlab.com/explody/tin/commit/657718a9210e4dc825d9585c8595944437e4569f))
+
+### Fix
+
+* readme and sem-ver ([57367e4](https://gitlab.com/explody/tin/commit/57367e45e238ea55e705239d1bc88e53c40df164))
+
 ## [1.1.1](https://gitlab.com/explody/tin/compare/v1.1.0...v1.1.1) (2021-09-15)
 
 
