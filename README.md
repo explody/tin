@@ -81,7 +81,7 @@ things:
 ---
 thing:
   id_attr: id
-  read:  # read-only
+  read_only:  # read-only
     - id
   must:  # When saving a newly created model instance, these attrs are required
     - name
