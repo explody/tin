@@ -8,12 +8,6 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 
-data_files = []
-directories = glob.glob("apis/*")
-for directory in directories:
-    files = glob.glob(directory + "/*")
-    data_files.append((directory, files))
-
 setup(
     name="tin",
     version=VERSION,
@@ -33,5 +27,10 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3",
     ],
-    data_files=data_files,
+    install_requires=[
+        "requests~=2.22.0",
+        "simplejson~=3.17.2",
+        "pyyaml>=5.4",
+        "deepmerge~=0.3.0",
+    ]
 )
