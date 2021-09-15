@@ -15,9 +15,8 @@ DEFAULTS = {
     "port": 443,
     "use_session": True,
     "ssl": {"verify": True},
-    "content_type": DEFAULT_CONTENT_TYPE
+    "content_type": DEFAULT_CONTENT_TYPE,
 }
-
 
 
 logging.basicConfig(level=logging.INFO)
@@ -175,9 +174,7 @@ class TinConfig(object):
             )
         else:
             # If there's no environment, all the config keys should already be top-level
-            self._api_config = always_merger.merge(
-                self._api_config, self.config_data
-            )
+            self._api_config = always_merger.merge(self._api_config, self.config_data)
 
         # At this point, we must have an api_file or there's no point in continuing
         if self._api_config.get("api_file", None) is None:
@@ -185,17 +182,16 @@ class TinConfig(object):
 
         ######################
         # Determine a config_dir, if any
-        if 'config_dir' not in self._api_config and self.config_src != 'ENV':
+        if "config_dir" not in self._api_config and self.config_src != "ENV":
             # If config_dir is in the api_config, it will be accessible via
             # self.config_dir already due to __getattr__. If not, set it based on
             # the main config path *IF* there is one
-            self._api_config['config_dir'] = os.path.dirname(
+            self._api_config["config_dir"] = os.path.dirname(
                 os.path.abspath(self.config_src)
             )
-            self.config_dir = self._api_config['config_dir']
-        elif 'config_dir' in self._api_config:
-            self.config_dir = self._api_config['config_dir']
-
+            self.config_dir = self._api_config["config_dir"]
+        elif "config_dir" in self._api_config:
+            self.config_dir = self._api_config["config_dir"]
 
         ######################
         # Credentials
@@ -230,7 +226,7 @@ class TinConfig(object):
         ######################
         # Minor data checks
         try:
-            self._api_config['port'] = int(self._api_config['port'])
+            self._api_config["port"] = int(self._api_config["port"])
         except ValueError:
             raise TinError("Invalid port, must be an integer")
 
@@ -239,9 +235,11 @@ class TinConfig(object):
         # API and Model configs must be files
         self.apidata = self._load_config_from_file(self.api_file)
 
-        self.models = self._load_config_from_file(
-            self._api_config.get("model_file", None)
-        ) if 'model_file' in self._api_config else {}
+        self.models = (
+            self._load_config_from_file(self._api_config.get("model_file", None))
+            if "model_file" in self._api_config
+            else {}
+        )
 
     def _update_from_env(self, config_data, environment=None):
         """Read configuration from environment variables

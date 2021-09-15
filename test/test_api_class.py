@@ -34,23 +34,36 @@ def test_no_session():
 
 def test_common_headers():
     myapi = TinApi(config_file="test/data/api/testservice.yml", environment="basic")
-    assert myapi.headers['someheader'] == "somevalue"
+    assert myapi.headers["someheader"] == "somevalue"
 
 
 def test_no_headers():
     myapi = TinApi(
         config_file="test/data/api/testservice.yml", environment="no_headers"
     )
-    assert myapi.headers == {'Accept': 'application/json', 'Content-type': 'application/json'}
+    assert myapi.headers == {
+        "Accept": "application/json",
+        "Content-type": "application/json",
+    }
 
 
 def test_set_headers():
     myapi = TinApi(config_file="test/data/api/testservice.yml", environment="basic")
     myapi.set_headers({"thing": "stuff"})
-    assert myapi.headers == {'Accept': 'application/json', 'Content-type': 'application/json', "someheader": "somevalue", "thing": "stuff"}
+    assert myapi.headers == {
+        "Accept": "application/json",
+        "Content-type": "application/json",
+        "someheader": "somevalue",
+        "thing": "stuff",
+    }
 
     myapi.set_headers({"someheader": "othervalue"})
-    assert myapi.headers == {'Accept': 'application/json', 'Content-type': 'application/json', "someheader": "othervalue", "thing": "stuff"}
+    assert myapi.headers == {
+        "Accept": "application/json",
+        "Content-type": "application/json",
+        "someheader": "othervalue",
+        "thing": "stuff",
+    }
 
     myapi.set_headers({"otherheader": "differentvalue"}, True)
     assert myapi.headers == {"otherheader": "differentvalue"}

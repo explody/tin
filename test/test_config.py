@@ -194,8 +194,9 @@ common:
 
     return ac
 
+
 def test_error_bad_env_json():
-    os.environ['TIN_CONFIG'] = 'this will load but yield empty config'
+    os.environ["TIN_CONFIG"] = "this will load but yield empty config"
     with pytest.raises(TinError):
         TinConfig()
 
@@ -238,7 +239,8 @@ def test_json_in_creds():
     os.environ["TIN__MODEL_FILE"] = "testservice-models.yml"
     os.environ["TIN__CREDENTIALS"] = "{'username': 'fake', 'password': 'fake'}"
     ac = TinConfig()
-        # assert "maximum recursion" in str(excinfo.value)
+    # assert "maximum recursion" in str(excinfo.value)
+
 
 def test_arg_config_yml():
     assert type(arg_config_yml()) is TinConfig
@@ -285,8 +287,8 @@ def test_file_no_model_file():
 def test_env_file_with_env_overrides():
     ac = env_file_config_env_override()
 
-    assert ac.host == 'fakehost'
-    assert ac.scheme == 'https'
+    assert ac.host == "fakehost"
+    assert ac.scheme == "https"
     assert ac.port == 9000
 
 
@@ -358,21 +360,21 @@ class TestEnvBasedConfigs:
     def test_config_files(self, config):
         assert config.config_src is "ENV"
         if config.config_dir:
-            assert os.path.join(
-                config.config_dir, "testservice-api.yml"
-            ) == "test/data/api/testservice-api.yml"
-            assert os.path.join(
-                config.config_dir, "testservice-models.yml"
-            ) == "test/data/api/testservice-models.yml"
+            assert (
+                os.path.join(config.config_dir, "testservice-api.yml")
+                == "test/data/api/testservice-api.yml"
+            )
+            assert (
+                os.path.join(config.config_dir, "testservice-models.yml")
+                == "test/data/api/testservice-models.yml"
+            )
         else:
             assert config.api_file == "test/data/api/testservice-api.yml"
             assert config.model_file == "test/data/api/testservice-models.yml"
 
     def test_config_dir(self, config):
         if config.config_dir:
-            assert config.config_dir == os.path.dirname(
-                "test/data/api/testservice.yml"
-            )
+            assert config.config_dir == os.path.dirname("test/data/api/testservice.yml")
 
     def test_credentials(self, config):
         assert config.credentials == {
