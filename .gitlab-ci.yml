@@ -38,7 +38,7 @@ release:
   stage: release
   script:
     - apk --update add git
-    - npm install semantic-release @semantic-release/gitlab @semantic-release/changelog conventional-changelog-eslint
+    - npm install semantic-release @semantic-release/gitlab @semantic-release/changelog @semantic-release/git conventional-changelog-eslint
     - npx semantic-release
   only:
     - release
