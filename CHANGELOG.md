@@ -1,3 +1,10 @@
+## [1.1.3](https://gitlab.com/explody/tin/compare/v1.1.2...v1.1.3) (2021-09-15)
+
+
+### Fix
+
+* version bump without breaking sem-ver ([10c22a3](https://gitlab.com/explody/tin/commit/10c22a398d1dc63cdf5e1357bd8e884a562f2e49))
+
 ## [1.1.2](https://gitlab.com/explody/tin/compare/v1.1.1...v1.1.2) (2021-09-15)
 
 
