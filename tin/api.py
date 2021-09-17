@@ -266,7 +266,7 @@ class TinApiMethod(TinApiBase):
         # This is where we can put validations on the kwargs,
         # based off data in api.yml (not there yet)
 
-        url = self.url
+        url = self.url  # FIXME: what?
         data = {}
         params = self.default_params.copy()
         tokens = self.default_tokens.copy()

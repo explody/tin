@@ -16,6 +16,7 @@ DEFAULTS = {
     "use_session": True,
     "ssl": {"verify": True},
     "content_type": DEFAULT_CONTENT_TYPE,
+    "auth_type": "basic"
 }
 
 
