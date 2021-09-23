@@ -1,3 +1,14 @@
+# [1.2.0](https://gitlab.com/explody/tin/compare/v1.1.3...v1.2.0) (2021-09-23)
+
+
+### Fix
+
+* removing api files ([453ba28](https://gitlab.com/explody/tin/commit/453ba281e90f9a3619619b6fa4f69844a8216955))
+
+### New
+
+* Support environment var prefixing ([76c0694](https://gitlab.com/explody/tin/commit/76c0694513741cd4a4a231e028f55010b788b1e5))
+
 ## [1.1.3](https://gitlab.com/explody/tin/compare/v1.1.2...v1.1.3) (2021-09-15)
 
 
