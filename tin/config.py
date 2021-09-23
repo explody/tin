@@ -16,6 +16,7 @@ DEFAULTS = {
     "use_session": True,
     "ssl": {"verify": True},
     "content_type": DEFAULT_CONTENT_TYPE,
+    "auth_type": "basic",
 }
 
 
@@ -76,7 +77,7 @@ class TinConfig(object):
 
     """
 
-    def __init__(self, config_file=None, environment=None):
+    def __init__(self, config_file=None, environment=None, env_prefix=None):
 
         self.api_name = None
         self.config_src = None
@@ -86,10 +87,17 @@ class TinConfig(object):
 
         self._api_config = dict(DEFAULTS)
 
+        ######################
+        # Env prefix
+        if env_prefix:
+            self._env_prefix = "TIN_{}".format(env_prefix).upper()
+        else:
+            self._env_prefix = "TIN"
+
         # Environment is required regardless of where config data comes from
         if environment is None:
-            if "TIN_ENV" in os.environ:
-                self.environment = os.environ.get("TIN_ENV")
+            if f"{self._env_prefix}_ENV" in os.environ:
+                self.environment = os.environ.get(f"{self._env_prefix}_ENV")
             else:
                 self.environment = None
         else:
@@ -100,8 +108,8 @@ class TinConfig(object):
         # Handle being passed config data from the environment, as a file or as JSON or
         # YAML, if a config file path was not given.
         if config_file is None:
-            if "TIN_CONFIG" in os.environ:
-                config = os.environ.get("TIN_CONFIG")
+            if f"{self._env_prefix}_CONFIG" in os.environ:
+                config = os.environ.get(f"{self._env_prefix}_CONFIG")
                 if os.path.isfile(config):
                     config_data = self._load_main_config_from_file(config)
                 else:
@@ -258,7 +266,12 @@ class TinConfig(object):
             see _loadfile()
         """
         for var, val in os.environ.items():
-            if var.startswith("TIN__{}".format(environment if environment else "")):
+            if var.startswith(
+                "{}__{}".format(
+                    self._env_prefix,
+                    environment.upper() if environment is not None else "",
+                )
+            ):
                 env_parts = [v.lower() for v in var.split("__")[1:]]
                 dict_from_list = current = {}
                 # Some confusing iteration that turns a list into nested dict keys
