@@ -74,6 +74,25 @@ def env_full_config():
     return ac
 
 
+def env_prefix_full_config():
+    clear_env()
+
+    os.environ["TIN_MYPREFIX__API_NAME"] = "ENV_FULL_API"
+    os.environ["TIN_MYPREFIX__HOST"] = "localhost"
+    os.environ["TIN_MYPREFIX__SCHEME"] = "http"
+    os.environ["TIN_MYPREFIX__PORT"] = "5000"
+    os.environ["TIN_MYPREFIX__BASEPATH"] = "/api"
+    os.environ["TIN_MYPREFIX__AUTH_TYPE"] = "basic"
+    os.environ["TIN_MYPREFIX__SSL__VERIFY"] = "true"
+    os.environ["TIN_MYPREFIX__CONFIG_DIR"] = "test/data/api"
+    os.environ["TIN_MYPREFIX__API_FILE"] = "testservice-api.yml"
+    os.environ["TIN_MYPREFIX__MODEL_FILE"] = "testservice-models.yml"
+    os.environ["TIN_MYPREFIX__CREDENTIALS"] = "credentials.yml"
+    ac = TinConfig(env_prefix="MYPREFIX")
+
+    return ac
+
+
 def env_env_config():
     clear_env()
 
@@ -95,6 +114,31 @@ def env_env_config():
     os.environ["TIN__COMMON__SSL__VERIFY"] = "true"
     os.environ["TIN__COMMON__BASEPATH"] = "/api"
     ac = TinConfig()
+
+    return ac
+
+
+def env_prefix_env_config():
+    clear_env()
+
+    os.environ["TIN_MYPREFIX_ENV"] = "basic"
+    os.environ["TIN_MYPREFIX__ENVIRONMENTS__BASIC__HOST"] = "localhost"
+    os.environ["TIN_MYPREFIX__ENVIRONMENTS__BASIC__SCHEME"] = "http"
+    os.environ["TIN_MYPREFIX__ENVIRONMENTS__BASIC__PORT"] = "5000"
+    os.environ[
+        "TIN_MYPREFIX__ENVIRONMENTS__BASIC__API_FILE"
+    ] = "test/data/api/testservice-api.yml"
+    os.environ[
+        "TIN_MYPREFIX__ENVIRONMENTS__BASIC__MODEL_FILE"
+    ] = "test/data/api/testservice-models.yml"
+    os.environ[
+        "TIN_MYPREFIX__ENVIRONMENTS__BASIC__CREDENTIALS"
+    ] = "test/data/api/credentials.yml"
+    os.environ["TIN_MYPREFIX__COMMON__API_NAME"] = "ENV_ENV_API"
+    os.environ["TIN_MYPREFIX__COMMON__AUTH_TYPE"] = "basic"
+    os.environ["TIN_MYPREFIX__COMMON__SSL__VERIFY"] = "true"
+    os.environ["TIN_MYPREFIX__COMMON__BASEPATH"] = "/api"
+    ac = TinConfig(env_prefix="MYPREFIX")
 
     return ac
 
@@ -349,7 +393,9 @@ class TestFileBasedConfigs:
     "config",
     [
         env_full_config(),
+        env_prefix_full_config(),
         env_env_config(),
+        env_prefix_env_config(),
         env_json_config_no_environment(),
         env_json_config_with_environment(),
         env_yaml_config_no_environment(),
