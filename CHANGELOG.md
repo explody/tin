@@ -1,3 +1,14 @@
+## [1.2.1](https://gitlab.com/explody/tin/compare/v1.2.0...v1.2.1) (2021-09-24)
+
+
+### Build
+
+* remove api linting during test ([d732b6d](https://gitlab.com/explody/tin/commit/d732b6db3676afa5398d41edc4b5189ca68bc992))
+
+### Fix
+
+* credentials from env ([456790b](https://gitlab.com/explody/tin/commit/456790b130bd445e75d96eae1c8968d21ab967e2))
+
 # [1.2.0](https://gitlab.com/explody/tin/compare/v1.1.3...v1.2.0) (2021-09-23)
 
 
