@@ -46,7 +46,6 @@ def env_file_config_env_override():
     clear_env()
     os.environ["TIN_CONFIG"] = "test/data/api/testservice.yml"
     os.environ["TIN_ENV"] = "basic"
-
     os.environ["TIN__ENVIRONMENTS__BASIC__HOST"] = "fakehost"
     os.environ["TIN__ENVIRONMENTS__BASIC__SCHEME"] = "https"
     os.environ["TIN__ENVIRONMENTS__BASIC__PORT"] = "9000"

@@ -1,4 +1,5 @@
 import json
+import os
 import pytest
 import requests
 
@@ -13,7 +14,14 @@ from pytest_httpserver import HTTPServer
 from types import ModuleType
 
 
+def clear_env():
+    for k in os.environ.keys():
+        if k.startswith("TIN"):
+            os.environ.pop(k)
+
+
 def api_inst(env="basic", config="test/data/api/testservice.yml"):
+    clear_env()
     # Just a shortcut to keep the repeating text down
     return TinApi(config_file=config, environment=env)
 

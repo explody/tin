@@ -254,7 +254,7 @@ class TinConfig(object):
 
         Reads config keys and values from env vars following a particular naming scheme:
 
-        TIN__<ENVIRONMENT|KEY>__<KEY>.. = <VALUE>
+        TIN__[ENVIRONMENTS__]<ENVIRONMENT|KEY>__<KEY>.. = <VALUE>
 
         See the class docs for more detail.
 
@@ -269,7 +269,8 @@ class TinConfig(object):
             if var.startswith(
                 "{}__{}".format(
                     self._env_prefix,
-                    environment.upper() if environment is not None else "",
+                    'ENVIRONMENTS__{}'.format(environment.upper()) if environment is not None
+                    else "",
                 )
             ):
                 env_parts = [v.lower() for v in var.split("__")[1:]]
