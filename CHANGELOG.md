@@ -1,3 +1,10 @@
+## [1.2.2](https://gitlab.com/explody/tin/compare/v1.2.1...v1.2.2) (2021-09-26)
+
+
+### Fix
+
+* Fixed dependencies for flit ([a80fde0](https://gitlab.com/explody/tin/commit/a80fde095cd34bb59846fe42282649b37593ecaa))
+
 ## [1.2.1](https://gitlab.com/explody/tin/compare/v1.2.0...v1.2.1) (2021-09-24)
 
 
