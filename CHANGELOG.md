@@ -1,3 +1,10 @@
+## [1.2.3](https://gitlab.com/explody/tin/compare/v1.2.2...v1.2.3) (2021-09-27)
+
+
+### Fix
+
+* allow unset credentials ([386279b](https://gitlab.com/explody/tin/commit/386279bb63d869c4604172afe1304fff1a80e111))
+
 ## [1.2.2](https://gitlab.com/explody/tin/compare/v1.2.1...v1.2.2) (2021-09-26)
 
 
