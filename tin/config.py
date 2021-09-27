@@ -203,8 +203,14 @@ class TinConfig(object):
 
         ######################
         # Credentials
-        if self._api_config.get("auth_type") in [None, "none"]:
-            self.credentials = None
+        if (
+            self._api_config.get("auth_type") in [None, "none"]
+            or "credentials" not in self._api_config
+        ):
+            # If auth_type is None, set credentials to None, otherwise, if auth_type is set
+            # but credentials are absent, continue instead of dying as creds may be set after
+            # instantiation
+            self._api_config["credentials"] = None
         else:
             try:
                 self.credentials = self._load_config_from_file(
@@ -269,7 +275,8 @@ class TinConfig(object):
             if var.startswith(
                 "{}__{}".format(
                     self._env_prefix,
-                    'ENVIRONMENTS__{}'.format(environment.upper()) if environment is not None
+                    "ENVIRONMENTS__{}".format(environment.upper())
+                    if environment is not None
                     else "",
                 )
             ):
@@ -402,6 +409,26 @@ class TinConfig(object):
             return getattr(self, key)
         except AttributeError:
             return None
+
+    @property
+    def credentials(self):
+        """Credentials property
+
+        Arguments:
+            None
+        """
+
+        return self._api_config.get('credentials', None)
+
+    @credentials.setter
+    def credentials(self, value):
+        """Credentials setter
+
+        Arguments:
+            value (any): The value to assign to credentials
+        """
+
+        self._api_config['credentials'] = value
 
     def find_config(self, filename):
         """Takes the given path to a config file, ensures it exists, and returns an
