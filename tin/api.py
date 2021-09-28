@@ -28,10 +28,17 @@ class TinApi(TinApiClass):
         tokenre (sre): Compiled regex for locating tokens in the url path string
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, config = None, **kwargs):
         super().__init__()
 
-        self.conf = TinConfig(**kwargs)
+        if config is None:
+            self.conf = TinConfig(**kwargs)
+        else:
+            if isinstance(config, TinConfig):
+                self.conf = config
+            else:
+                raise TinInvalidArgs("Config must be a TinConfig instance")
+
         self.obj_path = self.conf.api_name
 
         self._headers = self.conf.headers
