@@ -1,3 +1,10 @@
+# [1.3.0](https://gitlab.com/explody/tin/compare/v1.2.3...v1.3.0) (2021-09-29)
+
+
+### New
+
+* accept a TinConfig when instantiating TinApi ([41f2ad1](https://gitlab.com/explody/tin/commit/41f2ad1aa421b2e226e8fb8f2013d2d86341b4f7))
+
 ## [1.2.3](https://gitlab.com/explody/tin/compare/v1.2.2...v1.2.3) (2021-09-27)
 
 
