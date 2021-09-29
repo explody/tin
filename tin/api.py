@@ -3,12 +3,12 @@ import requests
 import simplejson as json
 import urllib
 
-from tin.auth import HTTPGenericHeaderAuth, HTTPGenericParameterAuth
-from tin.base import TinApiBase, TinApiClass
-from tin.config import TinConfig
-from tin.exceptions import TinInvalidArgs, TinError, TinObjectNotFound
-from tin.models import TinApiModelFactory
-from tin.response import TinApiResponseFactory
+from .auth import HTTPGenericHeaderAuth, HTTPGenericParameterAuth
+from .base import TinApiBase, TinApiClass
+from .config import TinConfig
+from .exceptions import TinInvalidArgs, TinError, TinObjectNotFound
+from .models import TinApiModelFactory
+from .response import TinApiResponseFactory
 
 from deepmerge import always_merger
 

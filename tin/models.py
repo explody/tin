@@ -1,5 +1,5 @@
-from tin.base import TinApiBase
-from tin.exceptions import TinModelError, TinError
+from .base import TinApiBase
+from .exceptions import TinModelError, TinError
 from deepmerge import always_merger
 import simplejson as json
 

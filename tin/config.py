@@ -4,7 +4,7 @@ import simplejson as json
 import yaml
 
 from deepmerge import always_merger
-from tin.exceptions import TinConfigNotFound, TinError
+from .exceptions import TinConfigNotFound, TinError
 
 
 # We only do JSON APIs right now

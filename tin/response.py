@@ -1,4 +1,4 @@
-from tin.exceptions import TinError
+from .exceptions import TinError
 
 
 class TinApiResponse(object):
