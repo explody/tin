@@ -1,3 +1,10 @@
+## [1.3.1](https://gitlab.com/explody/tin/compare/v1.3.0...v1.3.1) (2021-09-29)
+
+
+### Fix
+
+* easier importing for TinConfig ([aeabaf8](https://gitlab.com/explody/tin/commit/aeabaf86bf781f3fdc6bf07f32bce3724cb3a682))
+
 # [1.3.0](https://gitlab.com/explody/tin/compare/v1.2.3...v1.3.0) (2021-09-29)
 
 
