@@ -1,3 +1,10 @@
+## [1.3.3](https://gitlab.com/explody/tin/compare/v1.3.2...v1.3.3) (2021-10-06)
+
+
+### Fix
+
+* fix improper exception handling ([ccc590a](https://gitlab.com/explody/tin/commit/ccc590aca96de571f0b727344aac93bbc181688b))
+
 ## [1.3.2](https://gitlab.com/explody/tin/compare/v1.3.1...v1.3.2) (2021-09-29)
 
 
