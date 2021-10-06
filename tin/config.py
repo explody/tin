@@ -217,12 +217,13 @@ class TinConfig(object):
                     self._api_config["credentials"]
                 )
             except TinConfigNotFound:
-                self.credentials = self._load_json_or_yaml(
-                    self._api_config["credentials"]
-                )
-            except ValueError:
-                # doesn't load as json or yaml, may be a custom string
-                self.credentials = self._api_config["credentials"]
+                try:
+                    self.credentials = self._load_json_or_yaml(
+                        self._api_config["credentials"]
+                    )
+                except ValueError:
+                    # doesn't load as json or yaml, may be a custom string
+                    self.credentials = self._api_config["credentials"]
 
         ######################
         # Headers
