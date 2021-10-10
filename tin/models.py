@@ -43,6 +43,11 @@ class TinApiModel(TinApiBase):
 
     def __getattr__(self, item):
 
+        # Methods first
+        if self.api_method(item):
+            return self._call_api_method(self.api_method(item))
+
+        # Attributes and immutables second
         if item in self._data:
             return self._data[item]
         else:
@@ -74,6 +79,7 @@ class TinApiModel(TinApiBase):
                 )
 
     def clean(self, data):
+        """Strip out readonly fields"""
         clean_data = dict(data)
         if hasattr(self, "read_only"):
             for ro_attr in self.read_only:
@@ -81,6 +87,7 @@ class TinApiModel(TinApiBase):
         return clean_data
 
     def _confirm_i_have_id(self, action):
+        """Ensure an ID is set if an update method is called"""
         if self.id is None:
             raise TinError(
                 "Attempt to call {}() on an instance that isn't "
@@ -88,12 +95,20 @@ class TinApiModel(TinApiBase):
             )
 
     def _check_id(self, data):
+        """Ensure an ID passed in data is correct"""
         if self.id_attr in data:
             if self.id != data[self.id_attr]:
                 raise TinError(
                     "Given data has a different ID value ({}) than mine ({}), "
                     "cannot load or merge".format(data[self.id_attr], self.id)
                 )
+
+    def _call_api_method(self, api_method):
+        """Wraps method calls to ensure our ID is always passed to the method"""
+        def method_wrapper(**kwargs):
+            api_method(self.id, **kwargs)
+
+        return method_wrapper
 
     def create(self, data, **kwargs):
 
