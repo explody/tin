@@ -100,7 +100,7 @@ class TinApiResponseSingleton(TinApiResponse, dict):
 
 class TinApiResponseFactory(object):
     def __call__(self, response_data, response, method, nomodel=False):
-        if getattr(method, "expect_return_data", None) == "singleton":
+        if method.singleton:
             singleton = TinApiResponseSingleton(
                 response_data, response, method, nomodel
             )

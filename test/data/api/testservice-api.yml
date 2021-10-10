@@ -6,12 +6,11 @@ hasmethods:
       path:     /things
       expect:   200
       paginate: true
-      return:   list
     get:
       method:   GET
       path:     /things/:id
       expect:   [200, 201]
-      return:   singleton
+      singleton: true
     create:
       method:   POST
       path:     /things
@@ -40,22 +39,21 @@ container:
       list:
         method: GET
         path: /stuff/whatnot
-        return: dict
       get:
         method: GET
         path: /stuff/whatnot/:id
-        return: singleton
+        singleton: true
         crud_label: read
       create:
         method: POST
         path: /stuff/whatnot
         crud_label: create
-        return: singleton
+        singleton: true
       update:
         method: PUT
         path: /stuff/whatnot/:id
         crud_label: update
-        return: singleton
+        singleton: true
       delete:
         method: DELETE
         path: /stuff/whatnot/:id

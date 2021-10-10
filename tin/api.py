@@ -214,11 +214,6 @@ class TinApiMethod(TinApiBase):
         else:
             self.expect_return_codes = [200]
 
-        if "return" in self._method_data:
-            self.expect_return_data = self._method_data["return"]
-        else:
-            self.expect_return_data = "dict"
-
         if "paginate" in self._method_data:
             self._paginate = self._method_data["paginate"]
         else:
