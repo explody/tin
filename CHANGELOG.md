@@ -1,3 +1,11 @@
+## [1.3.4](https://gitlab.com/explody/tin/compare/v1.3.3...v1.3.4) (2021-10-10)
+
+
+### Fix
+
+* Arbitrary methods were broken ([5248649](https://gitlab.com/explody/tin/commit/5248649c1be698f7f0e81d321d0d40642eede175))
+* Singletons and test data ([73f0380](https://gitlab.com/explody/tin/commit/73f0380f487cd75ebcc849151bfd9aecc4219322))
+
 ## [1.3.3](https://gitlab.com/explody/tin/compare/v1.3.2...v1.3.3) (2021-10-06)
 
 
