@@ -1,3 +1,10 @@
+## [1.3.6](https://gitlab.com/explody/tin/compare/v1.3.5...v1.3.6) (2021-10-18)
+
+
+### Fix
+
+* can't constrain cruds to singletons after all ([0155a59](https://gitlab.com/explody/tin/commit/0155a597ddebb989af2e2ebfb4875c20201308e1))
+
 ## [1.3.5](https://gitlab.com/explody/tin/compare/v1.3.4...v1.3.5) (2021-10-18)
 
 
