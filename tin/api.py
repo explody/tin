@@ -112,7 +112,7 @@ class TinApi(TinApiClass):
                             method_name = mth_data.get("model_method_name") or mth
                             new_obj.model.add_method(method_name, new_method)
 
-                            if "crud_label" in mth_data:
+                            if "crud_label" in mth_data and mth_data.get('singleton', False):
                                 crud_method = mth_data["crud_label"].lower()
                                 if crud_method in crud_methods:
                                     new_obj.model.CRUD_METHODS[
