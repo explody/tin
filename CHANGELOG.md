@@ -1,3 +1,10 @@
+## [1.3.5](https://gitlab.com/explody/tin/compare/v1.3.4...v1.3.5) (2021-10-18)
+
+
+### Fix
+
+* only add methods as crud method when they're also singleton ([91dd647](https://gitlab.com/explody/tin/commit/91dd6471afe080df709a8376c96d5e5322a14365))
+
 ## [1.3.4](https://gitlab.com/explody/tin/compare/v1.3.3...v1.3.4) (2021-10-10)
 
 
