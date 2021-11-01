@@ -204,6 +204,21 @@ class TinApiMethod(TinApiBase):
         else:
             self.path = "{}{}".format(self.api.conf.basepath, self._method_data["path"])
 
+        if "scheme" in self._method_data:
+            self._scheme = self._method_data["scheme"]
+        else:
+            self._scheme = self.api.conf.scheme
+
+        if "host" in self._method_data:
+            self._host = self._method_data["host"]
+        else:
+            self._host = self.api.conf.host
+
+        if "port" in self._method_data:
+            self._port = self._method_data["port"]
+        else:
+            self._port = self.api.conf.port
+
         # If the method specifies an expected return code, grab it, otherwise
         # default to 200
         if "expect" in self._method_data:
@@ -239,9 +254,9 @@ class TinApiMethod(TinApiBase):
             self.default_tokens.update(self._method_data["default_tokens"])
 
         self.url = "%s://%s:%s%s" % (
-            self.api.conf.scheme,
-            self.api.conf.host,
-            self.api.conf.port,
+            self._scheme,
+            self._host,
+            self._port,
             self.path,
         )
 
@@ -251,9 +266,9 @@ class TinApiMethod(TinApiBase):
 
         return json.dumps(
             {
-                "scheme": self.api.conf.scheme,
-                "host": self.api.conf.host,
-                "port": self.api.conf.port,
+                "scheme": self._scheme,
+                "host": self._host,
+                "port": self._port,
                 "credentials": self.api.conf.credentials,
                 "url": self.url,
                 "method_data": self._method_data,
