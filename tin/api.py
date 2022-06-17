@@ -349,6 +349,9 @@ class TinApiMethod(TinApiBase):
                     ),
                 }
 
+                if self.api.conf.ssl.get("cert", None):
+                    request_args["cert"] = self.api.conf.ssl["cert"]
+
                 # Add data if we have any
                 if data:
                     request_args["data"] = json.dumps(data)
