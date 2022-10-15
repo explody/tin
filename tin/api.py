@@ -1,4 +1,3 @@
-from copy import deepcopy
 import re
 import requests
 import simplejson as json
@@ -242,12 +241,13 @@ class TinApiMethod(TinApiBase):
             self._paginate = True
 
         self.default_params = (
-            self.api.conf.default_params
+            dict(self.api.conf.default_params)
             if hasattr(self.api.conf, "default_params")
             else {}
         )
+
         self.default_tokens = (
-            self.api.conf.default_tokens
+            dict(self.api.conf.default_tokens)
             if hasattr(self.api.conf, "default_tokens")
             else {}
         )
@@ -296,8 +296,8 @@ class TinApiMethod(TinApiBase):
 
         url = self.url  # FIXME: what?
         data = {}
-        params = self.default_params.copy()
-        tokens = self.default_tokens.copy()
+        params = dict(self.default_params)
+        tokens = dict(self.default_tokens)
 
         # if this is true, TinApiResponseFactory will not instantiate model instances
         # from response data, and just return JSON.  Default is False.
@@ -310,6 +310,9 @@ class TinApiMethod(TinApiBase):
         # allow header overrides
         call_headers = dict(self._headers)
         call_headers = always_merger.merge(call_headers, kwargs.pop("headers", {}))
+
+        # lower header keys to make their names predictable so we can inspect them later
+        call_headers = {k.lower(): v for k, v in call_headers.items()}
 
         # No defaults for data.
         if "data" in kwargs:
@@ -369,7 +372,10 @@ class TinApiMethod(TinApiBase):
 
                 # Add data if we have any
                 if data:
-                    request_args["data"] = json.dumps(data)
+                    if call_headers.get("content-type") == "application/json":
+                        request_args["data"] = json.dumps(data)
+                    else:
+                        request_args["data"] = data
 
                 # Call the requests method
                 response = requests_method(url, **request_args)

@@ -7,6 +7,19 @@ headertests:
       headers:
         Accept: "application/json"
         Custom: "customvalue"
+payloads:
+  methods:
+    json:
+      method: POST
+      path: /things/payloadtest
+      headers:
+        content-type: "application/json"
+    form:
+      method: POST
+      path: /things/payloadtest
+      default_params: {}
+      headers:
+        content-type: "application/x-www-form-urlencoded"
 hasmethods:
   methods:
     list:

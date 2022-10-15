@@ -1,6 +1,7 @@
 import json
 import os
 import pytest
+import logging
 import requests
 
 from tin.api import TinApi, TinApiMethod
@@ -164,8 +165,7 @@ def test_params(httpserver: HTTPServer):
     response = testservice.hasmethods.get(id=1, params={"one": 1})
     assert response == {"single": "item"}
     assert (
-        response.response.url
-        == "http://localhost:5000/api/things/1?thing=stuff&confirm=True&one=1"
+        response.response.url == "http://localhost:5000/api/things/1?thing=stuff&one=1"
     )
 
 
@@ -311,3 +311,22 @@ def test_call_headers(httpserver: HTTPServer):
     ).respond_with_json(["hello"])
     testservice = api_inst()
     assert testservice.headertests.get(headers={"callheader": "callvalue"}) == ["hello"]
+
+
+def test_json_payload(httpserver: HTTPServer):
+    httpserver.expect_request(
+        "/api/things/payloadtest", method="POST", data='{"json": "data"}'
+    ).respond_with_json(["hello"])
+    testservice = api_inst()
+    assert testservice.payloads.json(data={"json": "data"}) == ["hello"]
+
+
+def test_form_payload(httpserver: HTTPServer):
+    httpserver.expect_request(
+        "/api/things/payloadtest", method="POST", data="first=data&second=value"
+    ).respond_with_json(["hello"])
+    testservice = api_inst()
+    # Content type for this method is "application/x-www-form-urlencoded"
+    assert testservice.payloads.form(data={"first": "data", "second": "value"}) == [
+        "hello"
+    ]
