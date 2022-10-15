@@ -9,6 +9,7 @@ from .exceptions import TinConfigNotFound, TinError
 
 # We only do JSON APIs right now
 DEFAULT_CONTENT_TYPE = "application/json"
+DEFAULT_ACCEPT = "*/*"
 
 DEFAULTS = {
     "scheme": "https",
@@ -16,6 +17,7 @@ DEFAULTS = {
     "use_session": True,
     "ssl": {"verify": True},
     "content_type": DEFAULT_CONTENT_TYPE,
+    "accept": DEFAULT_ACCEPT,
     "auth_type": "basic",
 }
 
@@ -230,13 +232,14 @@ class TinConfig(object):
         self.headers = {
             "Content-type": self._api_config.get("content_type", False)
             or DEFAULT_CONTENT_TYPE,
-            "Accept": self._api_config.get("content_type", False)
-            or DEFAULT_CONTENT_TYPE,
+            "Accept": self._api_config.get("accept", False) or DEFAULT_ACCEPT,
         }
 
         # Merge in any headers from the config
         if self._api_config.get("headers", None) is not None:
-            self.headers.update(self._api_config["headers"])
+            self.headers = always_merger.merge(
+                self.headers, self._api_config["headers"]
+            )
 
         ######################
         # Minor data checks
@@ -419,7 +422,7 @@ class TinConfig(object):
             None
         """
 
-        return self._api_config.get('credentials', None)
+        return self._api_config.get("credentials", None)
 
     @credentials.setter
     def credentials(self, value):
@@ -429,7 +432,7 @@ class TinConfig(object):
             value (any): The value to assign to credentials
         """
 
-        self._api_config['credentials'] = value
+        self._api_config["credentials"] = value
 
     def find_config(self, filename):
         """Takes the given path to a config file, ensures it exists, and returns an

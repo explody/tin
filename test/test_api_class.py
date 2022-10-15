@@ -42,7 +42,7 @@ def test_no_headers():
         config_file="test/data/api/testservice.yml", environment="no_headers"
     )
     assert myapi.headers == {
-        "Accept": "application/json",
+        "Accept": "*/*",
         "Content-type": "application/json",
     }
 
@@ -51,7 +51,7 @@ def test_set_headers():
     myapi = TinApi(config_file="test/data/api/testservice.yml", environment="basic")
     myapi.set_headers({"thing": "stuff"})
     assert myapi.headers == {
-        "Accept": "application/json",
+        "Accept": "*/*",
         "Content-type": "application/json",
         "someheader": "somevalue",
         "thing": "stuff",
@@ -59,7 +59,7 @@ def test_set_headers():
 
     myapi.set_headers({"someheader": "othervalue"})
     assert myapi.headers == {
-        "Accept": "application/json",
+        "Accept": "*/*",
         "Content-type": "application/json",
         "someheader": "othervalue",
         "thing": "stuff",
@@ -67,6 +67,25 @@ def test_set_headers():
 
     myapi.set_headers({"otherheader": "differentvalue"}, True)
     assert myapi.headers == {"otherheader": "differentvalue"}
+
+
+def test_method_headers():
+    myapi = TinApi(config_file="test/data/api/testservice.yml", environment="basic")
+
+    # Overall API headers should remain intact
+    assert myapi.headers == {
+        "Accept": "*/*",
+        "Content-type": "application/json",
+        "someheader": "somevalue",
+    }
+
+    # Headers for this method should be changed
+    assert myapi.headertests.get.headers == {
+        "Accept": "application/json",
+        "Content-type": "application/json",
+        "someheader": "somevalue",
+        "Custom": "customvalue",
+    }
 
 
 def test_basic_auth():

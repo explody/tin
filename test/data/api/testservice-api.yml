@@ -1,32 +1,40 @@
 ---
+headertests:
+  methods:
+    get:
+      method: GET
+      path: /things/headertest
+      headers:
+        Accept: "application/json"
+        Custom: "customvalue"
 hasmethods:
   methods:
     list:
-      method:   GET
-      path:     /things
-      expect:   200
+      method: GET
+      path: /things
+      expect: 200
       paginate: true
     get:
-      method:   GET
-      path:     /things/:id
-      expect:   [200, 201]
+      method: GET
+      path: /things/:id
+      expect: [200, 201]
       singleton: true
     create:
-      method:   POST
-      path:     /things
-      expect:   201
+      method: POST
+      path: /things
+      expect: 201
     update:
-      method:   PUT
-      path:     /things/:id
-      expect:   200
+      method: PUT
+      path: /things/:id
+      expect: 200
       crud_label: update
       default_tokens:
         otherthing: changedstuff
     delete:
-      method:   DELETE
-      path:     /things/:lots/:of/:tokens/here/:id
-      nobase:   true
-      expect:   204
+      method: DELETE
+      path: /things/:lots/:of/:tokens/here/:id
+      nobase: true
+      expect: 204
       default_params:
         confirm: true
 container:

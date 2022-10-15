@@ -1,3 +1,4 @@
+from copy import deepcopy
 import re
 import requests
 import simplejson as json
@@ -28,7 +29,7 @@ class TinApi(TinApiClass):
         tokenre (sre): Compiled regex for locating tokens in the url path string
     """
 
-    def __init__(self, config = None, **kwargs):
+    def __init__(self, config=None, **kwargs):
         super().__init__()
 
         if config is None:
@@ -219,6 +220,12 @@ class TinApiMethod(TinApiBase):
         else:
             self._port = self.api.conf.port
 
+        # Merge headers for the method if any are set
+        method_headers = dict(self.api.headers)
+        self._headers = always_merger.merge(
+            method_headers, self._method_data.get("headers", {})
+        )
+
         # If the method specifies an expected return code, grab it, otherwise
         # default to 200
         if "expect" in self._method_data:
@@ -262,6 +269,10 @@ class TinApiMethod(TinApiBase):
 
         super().__init__()
 
+    @property
+    def headers(self):
+        return self._headers
+
     def to_json(self):
 
         return json.dumps(
@@ -295,6 +306,10 @@ class TinApiMethod(TinApiBase):
         # Overwrite with provided arguments. Pop the value out of kwargs.
         if "params" in kwargs:
             params.update(kwargs.pop("params"))
+
+        # allow header overrides
+        call_headers = dict(self._headers)
+        call_headers = always_merger.merge(call_headers, kwargs.pop("headers", {}))
 
         # No defaults for data.
         if "data" in kwargs:
@@ -341,7 +356,7 @@ class TinApiMethod(TinApiBase):
 
                 # Common arguments with all methods
                 request_args = {
-                    "headers": self.api.headers,
+                    "headers": call_headers,
                     "auth": self.api.auth,
                     "verify": self.api.conf.ssl["verify"],
                     "params": urllib.parse.urlencode(

@@ -296,3 +296,18 @@ def test_paginate_nested_dict(httpserver: HTTPServer):
         "one": ["one"],
         "two": {"item": "value"},
     }
+
+
+def test_call_headers(httpserver: HTTPServer):
+    call_headers = {
+        "Content-type": "application/json",
+        "Accept": "application/json",
+        "someheader": "somevalue",
+        "Custom": "customvalue",
+        "callheader": "callvalue",
+    }
+    httpserver.expect_request(
+        "/api/things/headertest", method="GET", headers=call_headers
+    ).respond_with_json(["hello"])
+    testservice = api_inst()
+    assert testservice.headertests.get(headers={"callheader": "callvalue"}) == ["hello"]
